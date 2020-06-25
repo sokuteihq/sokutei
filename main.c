@@ -7,7 +7,7 @@ void iterate(int i){
     sokutei_create_integer_counter("ITER");
     sokutei_create_float_counter("FLOAT");
     for(a = 0; a < i; a++){
-        sokutei_alter_integer_counter("FLOAT", 1);
+        sokutei_alter_integer_counter("ITER", 1);
         sokutei_alter_float_counter("FLOAT", 1);
     }
 }
