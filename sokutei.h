@@ -4,6 +4,7 @@
 #define SOKUTEI_MAX_MEASURED_ITERATIONS 10
 #define SOKUTEI_MAX_COUNTER_COUNT  100
 #define SOKUTEI_MAX_COUNTER_NAME_LENGTH 30
+
 #define SOKUTEI_INTEGER_COUNTER_TYPE int
 #define SOKUTEI_FLOAT_COUNTER_TYPE double
 #define SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE int
@@ -23,6 +24,17 @@
 #define SOKUTEI_NOT_FOUND -1
 #define SOKUTEI_NOT_MATCHING_TYPE -2
 #define SOKUTEI_COUNTER_LIMIT_REACHED -3
+#define SOKUTEI_COUNTER_ALREADY_EXISTS -4
+
+/**
+ * Padding sets the number of bytes to separate names from type indicators, do we need to separate the type indicator with its own string terminator?
+ */
+#define SOKUTEI_TYPE_INDICATOR_PADDING 2
+
+/**
+ * SOKUTEI_TYPE_INDICATOR_INDEX is the index of the type indicator, which is positioned after the counter name's maximal index.
+ */
+#define SOKUTEI_TYPE_INDICATOR_INDEX (SOKUTEI_MAX_COUNTER_NAME_LENGTH + 1)
 
 
 #ifdef SOKUTEI_LOGGING_ENABLED
@@ -48,12 +60,15 @@ char *sokutei_strcpy(char *string_a, const char *string_b){
 #define sokutei_string_equals(string_a, string_b) (sokutei_strcmp(string_a, string_b) == 0)
 
 
-int sokutei_number_of_iterations = SOKUTEI_MAX_MEASURED_ITERATIONS;
+#define sokutei_counter_at_index(type, index) *(type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
+
+int sokutei_number_of_iterations =
+        SOKUTEI_MAX_MEASURED_ITERATIONS;
 
 /**
- * sokutei_counter_definitions is an array consist of the counter name followed by string separator (\0), and the type of the counter
+ * sokutei_counter_definitions is an array, which consists of the counter name followed by string terminator (\0), and the type of the counter.
  */
-char sokutei_counter_definitions[SOKUTEI_MAX_COUNTER_COUNT][SOKUTEI_MAX_COUNTER_NAME_LENGTH + 2] = {'\0'};
+char sokutei_counter_definitions[SOKUTEI_MAX_COUNTER_COUNT][SOKUTEI_MAX_COUNTER_NAME_LENGTH + SOKUTEI_TYPE_INDICATOR_PADDING] = {'\0'};
 
 
 char sokutei_counters[SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES * SOKUTEI_MAX_MEASURED_ITERATIONS] = {0};
@@ -62,7 +77,7 @@ int number_of_iterations = SOKUTEI_MAX_MEASURED_ITERATIONS;
 
 
 char sokutei_get_type_of(const int index){
-    return sokutei_counter_definitions[index][31];
+    return sokutei_counter_definitions[index][SOKUTEI_TYPE_INDICATOR_INDEX];
 }
 
 
@@ -78,29 +93,46 @@ int sokutei_get_index_of_counter(const char *counter_name){
 
 
 void sokutei_set_number_of_iterations(const int iterations){
-
     if(SOKUTEI_MAX_MEASURED_ITERATIONS < iterations){
         //TODO call error
         return;
     }
-
     number_of_iterations = iterations;
 }
 
 
-int sokutei_add_counter(const char *counter_name, char type){
+inline int sokutei_is_matching_type(char type){
+    return type == SOKUTEI_INTEGER_TYPE || type == SOKUTEI_FLOAT_TYPE || type == SOKUTEI_INTERVAL_TYPE;
+}
 
-    if(type != SOKUTEI_INTEGER_TYPE && type != SOKUTEI_FLOAT_TYPE && type != SOKUTEI_INTERVAL_TYPE){
+
+inline int sokutei_is_counter_limit_reached(){
+    return sokutei_number_of_counters + 1 >= SOKUTEI_MAX_COUNTER_COUNT;
+}
+
+
+inline int sokutei_create_new_counter(const char *counter_name, char type){
+    sokutei_strcpy(sokutei_counter_definitions[sokutei_number_of_counters], counter_name);
+    sokutei_counter_definitions[sokutei_number_of_counters][SOKUTEI_TYPE_INDICATOR_INDEX] = type;
+    sokutei_number_of_counters++;
+    return 0;
+}
+
+
+int sokutei_add_counter(const char *counter_name, char type){
+    if(!sokutei_is_matching_type(type)){
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
-    if(sokutei_number_of_counters + 1 >= SOKUTEI_MAX_COUNTER_COUNT){
+    if(sokutei_is_counter_limit_reached()){
         return SOKUTEI_COUNTER_LIMIT_REACHED;
     }
 
-    sokutei_strcpy(sokutei_counter_definitions[sokutei_number_of_counters], counter_name);
-    sokutei_counter_definitions[sokutei_number_of_counters][SOKUTEI_MAX_COUNTER_NAME_LENGTH + 1] = type;
-    sokutei_number_of_counters++;
+    if(sokutei_get_index_of_counter(counter_name) != SOKUTEI_NOT_FOUND){
+        return SOKUTEI_COUNTER_ALREADY_EXISTS;
+    }
+
+    return sokutei_create_new_counter(counter_name, type);
 }
 
 
@@ -115,9 +147,7 @@ SOKUTEI_INTEGER_COUNTER_TYPE sokutei_integer_get_counter(const char *counter_nam
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
-    SOKUTEI_INTEGER_COUNTER_TYPE *counter = sokutei_counters + (index * MAX_SIZE_OF_TYPES);
-
-    return *counter;
+    return sokutei_counter_at_index(SOKUTEI_INTEGER_COUNTER_TYPE, index);
 }
 
 
@@ -132,9 +162,7 @@ SOKUTEI_INTEGER_COUNTER_TYPE sokutei_integer_increment_counter(const char *count
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
-    SOKUTEI_INTEGER_COUNTER_TYPE *counter = (void *)sokutei_counters + (index * MAX_SIZE_OF_TYPES);
-
-    return *counter += by;
+    return sokutei_counter_at_index(SOKUTEI_INTEGER_COUNTER_TYPE, index) += by;
 }
 
 
@@ -149,9 +177,7 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_get_counter(const char *counter_name){
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
-    SOKUTEI_FLOAT_COUNTER_TYPE *counter = sokutei_counters + (index * MAX_SIZE_OF_TYPES);
-
-    return (SOKUTEI_FLOAT_COUNTER_TYPE) *counter;
+    return sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, index);
 }
 
 
@@ -167,9 +193,8 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
-    SOKUTEI_FLOAT_COUNTER_TYPE *counter = sokutei_counters + (index * MAX_SIZE_OF_TYPES);
 
-    return *counter += by;
+    return  sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, index) += by;
 }
 
 
