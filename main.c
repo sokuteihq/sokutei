@@ -3,6 +3,7 @@
 #include "sokutei.h"
 
 void iterate(int i){
+    sokutei_iteration_start();
     int a = 0;
     sokutei_create_integer_counter("ITER");
     sokutei_create_float_counter("FLOAT");
@@ -10,6 +11,7 @@ void iterate(int i){
         sokutei_alter_integer_counter("ITER", 1);
         sokutei_alter_float_counter("FLOAT", 1);
     }
+    sokutei_iteration_finish();
 }
 
 int main() {

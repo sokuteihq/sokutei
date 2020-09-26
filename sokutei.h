@@ -60,10 +60,12 @@ char *sokutei_strcpy(char *string_a, const char *string_b){
 #define sokutei_string_equals(string_a, string_b) (sokutei_strcmp(string_a, string_b) == 0)
 
 
-#define sokutei_counter_at_index(type, index) *(type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
 
 int sokutei_number_of_iterations =
         SOKUTEI_MAX_MEASURED_ITERATIONS;
+
+int sokutei_current_iteration = 0;
+
 
 /**
  * sokutei_counter_definitions is an array, which consists of the counter name followed by string terminator (\0), and the type of the counter.
@@ -72,9 +74,10 @@ char sokutei_counter_definitions[SOKUTEI_MAX_COUNTER_COUNT][SOKUTEI_MAX_COUNTER_
 
 
 char sokutei_counters[SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES * SOKUTEI_MAX_MEASURED_ITERATIONS] = {0};
-int  sokutei_number_of_counters = 0;
+int sokutei_number_of_counters = 0;
 int number_of_iterations = SOKUTEI_MAX_MEASURED_ITERATIONS;
 
+#define sokutei_counter_at_index(type, index) *(type *)(sokutei_counters + (sokutei_current_iteration * index * MAX_SIZE_OF_TYPES))
 
 char sokutei_get_type_of(const int index){
     return sokutei_counter_definitions[index][SOKUTEI_TYPE_INDICATOR_INDEX];
@@ -100,8 +103,16 @@ void sokutei_set_number_of_iterations(const int iterations){
     number_of_iterations = iterations;
 }
 
+void sokutei_iteration_finish_handler(){
+    if(sokutei_current_iteration < SOKUTEI_MAX_MEASURED_ITERATIONS - 1) {
+        sokutei_current_iteration++;
+    } else {
+        //TODO call error
+    }
+}
 
-inline int sokutei_is_matching_type(char type){
+
+inline int sokutei_is_unknown_counter_type(const char type){
     return type == SOKUTEI_INTEGER_TYPE || type == SOKUTEI_FLOAT_TYPE || type == SOKUTEI_INTERVAL_TYPE;
 }
 
@@ -111,7 +122,7 @@ inline int sokutei_is_counter_limit_reached(){
 }
 
 
-inline int sokutei_create_new_counter(const char *counter_name, char type){
+inline int sokutei_create_new_counter(const char *counter_name, const char type){
     sokutei_strcpy(sokutei_counter_definitions[sokutei_number_of_counters], counter_name);
     sokutei_counter_definitions[sokutei_number_of_counters][SOKUTEI_TYPE_INDICATOR_INDEX] = type;
     sokutei_number_of_counters++;
@@ -119,8 +130,8 @@ inline int sokutei_create_new_counter(const char *counter_name, char type){
 }
 
 
-int sokutei_add_counter(const char *counter_name, char type){
-    if(!sokutei_is_matching_type(type)){
+int sokutei_add_counter(const char *counter_name, const char type){
+    if(sokutei_is_unknown_counter_type(type)){
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
@@ -181,7 +192,7 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_get_counter(const char *counter_name){
 }
 
 
-SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_name, SOKUTEI_FLOAT_COUNTER_TYPE by){
+SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_name, const SOKUTEI_FLOAT_COUNTER_TYPE by){
     const int index = sokutei_get_index_of_counter(counter_name);
 
     if(index == SOKUTEI_NOT_FOUND){
@@ -192,11 +203,14 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
         //TODO call error
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
-
-
-    return  sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, index) += by;
+    
+    return sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, index) += by;
 }
 
+
+/// Iterations
+#define sokutei_iteration_start() ;
+#define sokutei_iteration_finish() sokutei_iteration_finish_handler()
 
 /// Counter creations
 #define SOKUTEI_DEFINE_COUNTER(counter_name, type) sokutei_add_counter(counter_name, type)
@@ -206,14 +220,15 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
 
 
 /// Integer counter operations
-//#define SOKUTEI_INCREMENT_INTEGER_COUNTER(x) sokutei_integer_increment_counter(x, 1)
+#define sokutei_increment_integer_counter(x) sokutei_integer_increment_counter(x, 1)
 #define sokutei_alter_integer_counter(x, y) sokutei_integer_increment_counter(x, y)
 #define sokutei_get_integer_counter(x) sokutei_integer_get_counter(x)
 
-//#define sokutei_alter_float_counter(x) sokutei_float_increment_counter(x, 1.0)
+#define sokutei_increment_float_counter(x) sokutei_float_increment_counter(x, 1.0)
 #define sokutei_alter_float_counter(x, y) sokutei_float_increment_counter(x, y)
 #define sokutei_get_float_counter(x) sokutei_float_get_counter(x)
 
 
 
 #endif //END OF SOKUTEI_BENCHMARK_H
+
