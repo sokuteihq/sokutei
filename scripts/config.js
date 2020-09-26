@@ -5,7 +5,7 @@ const config = convict({
     owner: {
       doc: 'The owner of the repository.',
       format: String,
-      default: 'sokutei'
+      default: 'sokuteihq'
     },
     name: {
       doc: 'The name of the repository.',
