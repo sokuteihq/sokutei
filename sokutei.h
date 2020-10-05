@@ -77,7 +77,8 @@ char sokutei_counters[SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES * SOKUTEI_MA
 int sokutei_number_of_counters = 0;
 int number_of_iterations = SOKUTEI_MAX_MEASURED_ITERATIONS;
 
-#define sokutei_counter_at_index(type, index) *(type *)(sokutei_counters + (sokutei_current_iteration * index * MAX_SIZE_OF_TYPES))
+#define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (sokutei_current_iteration * SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES) + (index * MAX_SIZE_OF_TYPES))
+#define sokutei_counter_at_index2(type, index) (type *)(sokutei_counters + (sokutei_current_iteration * SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES) + (index * MAX_SIZE_OF_TYPES))
 
 char sokutei_get_type_of(const int index){
     return sokutei_counter_definitions[index][SOKUTEI_TYPE_INDICATOR_INDEX];
@@ -113,7 +114,7 @@ void sokutei_iteration_finish_handler(){
 
 
 inline int sokutei_is_unknown_counter_type(const char type){
-    return type == SOKUTEI_INTEGER_TYPE || type == SOKUTEI_FLOAT_TYPE || type == SOKUTEI_INTERVAL_TYPE;
+    return !(type == SOKUTEI_INTEGER_TYPE || type == SOKUTEI_FLOAT_TYPE || type == SOKUTEI_INTERVAL_TYPE);
 }
 
 
@@ -158,7 +159,7 @@ SOKUTEI_INTEGER_COUNTER_TYPE sokutei_integer_get_counter(const char *counter_nam
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
-    return sokutei_counter_at_index(SOKUTEI_INTEGER_COUNTER_TYPE, index);
+    return *sokutei_counter_at_index(SOKUTEI_INTEGER_COUNTER_TYPE, index);
 }
 
 
@@ -173,7 +174,7 @@ SOKUTEI_INTEGER_COUNTER_TYPE sokutei_integer_increment_counter(const char *count
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
-    return sokutei_counter_at_index(SOKUTEI_INTEGER_COUNTER_TYPE, index) += by;
+    return *sokutei_counter_at_index(SOKUTEI_INTEGER_COUNTER_TYPE, index) += by;
 }
 
 
@@ -188,7 +189,7 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_get_counter(const char *counter_name){
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
-    return sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, index);
+    return *sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, index);
 }
 
 
@@ -204,7 +205,7 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
     
-    return sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, index) += by;
+    return *sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, index) += by;
 }
 
 

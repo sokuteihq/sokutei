@@ -2,7 +2,7 @@
 #define SOKUTEI_NO_STDLIB
 #include "sokutei.h"
 
-void iterate(int i){
+void iterate2(int i){
     sokutei_iteration_start();
     int a = 0;
     sokutei_create_integer_counter("ITER");
@@ -12,6 +12,18 @@ void iterate(int i){
         sokutei_alter_float_counter("FLOAT", 1);
     }
     sokutei_iteration_finish();
+}
+void iterate(int i) {
+    sokutei_create_integer_counter("ITER");
+
+    int a = 0;
+    for (a = 0; a < i; a++) {
+        sokutei_iteration_start();
+        sokutei_alter_integer_counter("ITER", a);
+        printf("ITER: %d\n", sokutei_get_integer_counter("ITER"));
+        sokutei_iteration_finish();
+    }
+
 }
 
 int main() {
