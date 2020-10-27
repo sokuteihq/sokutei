@@ -1,0 +1,29 @@
+{
+  "name": "@sokuteihq/sokutei",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "generate:branch": "node ./scripts/generate-branch-name.js"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-push": "node ./scripts/check-branch-name.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sokuteihq/sokutei.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sokuteihq/sokutei/issues"
+  },
+  "homepage": "https://github.com/sokuteihq/sokutei#readme",
+  "dependencies": {
+    "convict": "^6.0.0",
+    "got": "^11.7.0",
+    "husky": "^4.3.0"
+  }
+}
