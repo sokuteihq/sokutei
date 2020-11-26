@@ -201,11 +201,11 @@ TEST sokutei_strcpy_should_copy_all_characters_of_a_maximum_length_input(void){
 }
 
 SUITE(sokutei_strcpy_tests) {
-            RUN_TEST(sokutei_strcpy_should_produce_an_empty_string_on_empty_input);
-            RUN_TEST(sokutei_strcpy_should_copy_the_input_to_the_buffer_1);
-            RUN_TEST(sokutei_strcpy_should_copy_the_input_to_the_buffer_2);
-            RUN_TEST(sokutei_strcpy_should_copy_only_the_maximum_number_of_characters);
-            RUN_TEST(sokutei_strcpy_should_copy_all_characters_of_a_maximum_length_input);
+    RUN_TEST(sokutei_strcpy_should_produce_an_empty_string_on_empty_input);
+    RUN_TEST(sokutei_strcpy_should_copy_the_input_to_the_buffer_1);
+    RUN_TEST(sokutei_strcpy_should_copy_the_input_to_the_buffer_2);
+    RUN_TEST(sokutei_strcpy_should_copy_only_the_maximum_number_of_characters);
+    RUN_TEST(sokutei_strcpy_should_copy_all_characters_of_a_maximum_length_input);
 }
 
 
