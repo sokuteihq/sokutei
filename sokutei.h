@@ -47,6 +47,7 @@
 
 /// String functions
 
+
 int sokutei_strcmp(const char *string_a, const char *string_b){
     int i = 0;
     while(string_a[i] == string_b[i] && string_a[i]) i++;
@@ -67,6 +68,7 @@ char *sokutei_strcpy(char *string_a, const char *string_b){
 
 /// Counters
 
+
 /**
  * sokutei_counter_definitions is an array, which consists of the counter name followed by string terminator (\0), and the type of the counter.
  */
@@ -84,6 +86,7 @@ int sokutei_number_of_counters = 0;
 #define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
 
 
+
 char sokutei_get_type_of(const int index){
     return sokutei_counter_definitions[index][SOKUTEI_TYPE_INDICATOR_INDEX];
 }
@@ -98,6 +101,7 @@ int sokutei_get_index_of_counter(const char *counter_name){
     }
     return SOKUTEI_NOT_FOUND;
 }
+
 
 
 inline int sokutei_is_unknown_counter_type(const char type){
@@ -221,11 +225,6 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
 
 
 
-
-
-
-
-
 ///------------ Sokutei API ----
 
 //////------ Iteration handling ------
@@ -253,6 +252,7 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
 //////------ Float counter operations
 
 ///--- Sokutei API
+
 
 
 #endif //END OF SOKUTEI_BENCHMARK_H
