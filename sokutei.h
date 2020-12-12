@@ -44,6 +44,10 @@
 #endif
 
 
+
+/// String functions
+
+
 int sokutei_strcmp(const char *string_a, const char *string_b){
     int i = 0;
     while(string_a[i] == string_b[i] && string_a[i]) i++;
@@ -59,12 +63,10 @@ char *sokutei_strcpy(char *string_a, const char *string_b){
 }
 #define sokutei_string_equals(string_a, string_b) (sokutei_strcmp(string_a, string_b) == 0)
 
+///--- String functions
 
 
-int sokutei_number_of_iterations =
-        SOKUTEI_MAX_MEASURED_ITERATIONS;
-
-int sokutei_current_iteration = 0;
+/// Counters
 
 
 /**
@@ -73,12 +75,17 @@ int sokutei_current_iteration = 0;
 char sokutei_counter_definitions[SOKUTEI_MAX_COUNTER_COUNT][SOKUTEI_MAX_COUNTER_NAME_LENGTH + SOKUTEI_TYPE_INDICATOR_PADDING] = {'\0'};
 
 
-char sokutei_counters[SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES * SOKUTEI_MAX_MEASURED_ITERATIONS] = {0};
+char sokutei_counters[SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES] = {0};
 int sokutei_number_of_counters = 0;
-int number_of_iterations = SOKUTEI_MAX_MEASURED_ITERATIONS;
 
-#define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (sokutei_current_iteration * SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES) + (index * MAX_SIZE_OF_TYPES))
-#define sokutei_counter_at_index2(type, index) (type *)(sokutei_counters + (sokutei_current_iteration * SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES) + (index * MAX_SIZE_OF_TYPES))
+///--- Counters
+
+
+/// Low level counter handling
+
+#define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
+
+
 
 char sokutei_get_type_of(const int index){
     return sokutei_counter_definitions[index][SOKUTEI_TYPE_INDICATOR_INDEX];
@@ -95,22 +102,6 @@ int sokutei_get_index_of_counter(const char *counter_name){
     return SOKUTEI_NOT_FOUND;
 }
 
-
-void sokutei_set_number_of_iterations(const int iterations){
-    if(SOKUTEI_MAX_MEASURED_ITERATIONS < iterations){
-        //TODO call error
-        return;
-    }
-    number_of_iterations = iterations;
-}
-
-void sokutei_iteration_finish_handler(){
-    if(sokutei_current_iteration < SOKUTEI_MAX_MEASURED_ITERATIONS - 1) {
-        sokutei_current_iteration++;
-    } else {
-        //TODO call error
-    }
-}
 
 
 inline int sokutei_is_unknown_counter_type(const char type){
@@ -147,6 +138,28 @@ int sokutei_add_counter(const char *counter_name, const char type){
     return sokutei_create_new_counter(counter_name, type);
 }
 
+///--- Low level counter handling
+
+
+/// Iterations
+
+int sokutei_number_of_iterations =
+        SOKUTEI_MAX_MEASURED_ITERATIONS;
+
+int sokutei_current_iteration = 0;
+
+
+void sokutei_iteration_finish_handler(){
+    int index;
+    for(index = 0; index < (SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES); index++){
+        sokutei_counters[index] = 0;
+    }
+}
+
+///--- Iterations
+
+
+/// Counter Getter and Setter functions
 
 SOKUTEI_INTEGER_COUNTER_TYPE sokutei_integer_get_counter(const char *counter_name){
     const int index = sokutei_get_index_of_counter(counter_name);
@@ -201,33 +214,44 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
     }
 
     if(sokutei_get_type_of(index) != SOKUTEI_FLOAT_TYPE){
-        //TODO call error
+        // TODO call error
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
     
     return *sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, index) += by;
 }
 
+///--- Counter Getter and Setter functions
 
-/// Iterations
+
+
+///------------ Sokutei API ----
+
+//////------ Iteration handling ------
 #define sokutei_iteration_start() ;
 #define sokutei_iteration_finish() sokutei_iteration_finish_handler()
+//////------ Iteration handling ------//////
 
-/// Counter creations
+////// Counter creations
 #define SOKUTEI_DEFINE_COUNTER(counter_name, type) sokutei_add_counter(counter_name, type)
 #define sokutei_create_integer_counter(counter_name) SOKUTEI_DEFINE_COUNTER(counter_name, SOKUTEI_INTEGER_TYPE)
 #define sokutei_create_float_counter(counter_name) SOKUTEI_DEFINE_COUNTER(counter_name, SOKUTEI_FLOAT_TYPE)
 #define sokutei_create_interval_counter(counter_name) SOKUTEI_DEFINE_COUNTER(counter_name, SOKUTEI_INTERVAL_TYPE)
+//////------ Counter creations
 
-
-/// Integer counter operations
+////// Integer counter operations
 #define sokutei_increment_integer_counter(x) sokutei_integer_increment_counter(x, 1)
 #define sokutei_alter_integer_counter(x, y) sokutei_integer_increment_counter(x, y)
 #define sokutei_get_integer_counter(x) sokutei_integer_get_counter(x)
+//////------ Integer counter operations
 
+////// Float counter operations
 #define sokutei_increment_float_counter(x) sokutei_float_increment_counter(x, 1.0)
 #define sokutei_alter_float_counter(x, y) sokutei_float_increment_counter(x, y)
 #define sokutei_get_float_counter(x) sokutei_float_get_counter(x)
+//////------ Float counter operations
+
+///--- Sokutei API
 
 
 
