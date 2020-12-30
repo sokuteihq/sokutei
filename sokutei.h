@@ -70,10 +70,18 @@ char *sokutei_strcpy(char *string_a, const char *string_b){
 #define SOKUTEI_JSON 0
 #define SOKUTEI_CSV 1
 
-#define SOKUTEI_REPORTING_FORMAT SOKUTEI_JSON
+#ifndef SOKUTEI_REPORTING_FORMAT
+    #define SOKUTEI_REPORTING_FORMAT SOKUTEI_JSON
+#endif
 
+
+#ifndef SOKUTEI_REPORTING_FORMAT
 #define sokutei_print_char(char) sokutei_print_char_handler(char)
+#endif
+
+#ifndef SOKUTEI_REPORTING_FORMAT
 #define sokutei_print_string(string) sokutei_print_string_handler(string)
+#endif
 
 #if SOKUTEI_REPORTING_FORMAT == SOKUTEI_JSON
     #define sokutei_begin_report() sokutei_json_begin_report()
@@ -98,9 +106,12 @@ char sokutei_counter_definitions[SOKUTEI_MAX_COUNTER_COUNT][SOKUTEI_MAX_COUNTER_
 char sokutei_counters[SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES] = {0};
 int sokutei_number_of_counters = 0;
 
+#define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
+
 char sokutei_counter_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
 
-void sokutei_integer_counter_to_string(SOKUTEI_INTEGER_COUNTER_TYPE integer){
+void sokutei_integer_counter_to_string(int counter_index){
+    SOKUTEI_INTEGER_COUNTER_TYPE integer = *sokutei_counter_at_index(SOKUTEI_INTEGER_COUNTER_TYPE, counter_index);
     int index = SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH;
     sokutei_counter_to_string_buffer[index--] = '\0';
     int digits = 0;
@@ -144,9 +155,6 @@ void sokutei_error_counter_to_string(){
 
 
 /// Low level counter handling
-
-#define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
-
 
 
 char sokutei_get_type_of(const int index){
@@ -290,11 +298,9 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
 /// Reporting functions
 
 void sokutei_print_char_handler(const char c) {
-    putchar(c);
 }
 
 void sokutei_print_string_handler(const char *string) {
-    printf("%s", string);
 }
 
 void sokutei_convert_counter_to_string(const int counter_index) {
@@ -404,4 +410,3 @@ void sokutei_csv_end_report(){
 
 
 #endif //END OF SOKUTEI_BENCHMARK_H
-
