@@ -268,6 +268,91 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
 ///--- Counter Getter and Setter functions
 
 
+/// Reporting functions
+
+void sokutei_print_char_handler(const char c) {
+    putchar(c);
+}
+
+void sokutei_print_string_handler(const char *string) {
+    printf("%s", string);
+}
+
+void sokutei_convert_counter_to_string(const int counter_index) {
+    switch (sokutei_get_type_of(counter_index)) {
+    case SOKUTEI_INTEGER_TYPE:
+        sokutei_integer_counter_to_string(counter_index);
+        break;
+    case SOKUTEI_FLOAT_TYPE:
+        sokutei_float_counter_to_string(counter_index);
+        break;
+    case SOKUTEI_INTERVAL_TYPE:
+        sokutei_interval_timer_counter_to_string(counter_index);
+        break;
+    
+    default:
+        sokutei_error_counter_to_string();
+        break;
+    }
+}
+
+
+void sokutei_json_begin_report() {
+    sokutei_print_string("[");
+}
+
+void sokutei_json_report_iteration(){
+    if(sokutei_current_iteration > 0) {
+        sokutei_print_string(",");
+    }
+    sokutei_print_string("{");
+    int counter;
+    for(counter = 0; counter < sokutei_number_of_counters; counter++) {
+        if(counter > 0) {
+            sokutei_print_string(",");
+        }
+        sokutei_print_string("\"");
+        sokutei_print_string(sokutei_counter_definitions[counter]);
+        sokutei_print_string("\":");
+        sokutei_convert_counter_to_string(counter);
+        sokutei_print_string(sokutei_counter_to_string_buffer);
+    }
+    sokutei_print_string("}");
+}
+
+void sokutei_json_end_report(){
+    sokutei_print_string("]");
+}
+
+void sokutei_csv_begin_report() {
+    int counter;
+    for(counter = 0; counter < sokutei_number_of_counters; counter++) {
+        if(counter > 0) {
+            sokutei_print_string(",");
+        }
+        sokutei_print_string(sokutei_counter_definitions[counter]);
+    }
+    sokutei_print_string("\n");
+}
+
+
+void sokutei_csv_report_iteration(){
+    int counter;
+    for(counter = 0; counter < sokutei_number_of_counters; counter++) {
+        if(counter > 0) {
+            sokutei_print_string(",");
+        }
+        sokutei_convert_counter_to_string(counter);
+        sokutei_print_string(sokutei_counter_to_string_buffer);
+    }
+    sokutei_print_string("\n");
+}
+
+void sokutei_csv_end_report(){
+    ;
+}
+
+///--- Reporting functions
 
 ///------------ Sokutei API ----
 
