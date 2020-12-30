@@ -4,6 +4,7 @@
 #define SOKUTEI_MAX_MEASURED_ITERATIONS 10
 #define SOKUTEI_MAX_COUNTER_COUNT  100
 #define SOKUTEI_MAX_COUNTER_NAME_LENGTH 30
+#define SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH 64
 
 #define SOKUTEI_INTEGER_COUNTER_TYPE int
 #define SOKUTEI_FLOAT_COUNTER_TYPE double
@@ -77,6 +78,29 @@ char sokutei_counter_definitions[SOKUTEI_MAX_COUNTER_COUNT][SOKUTEI_MAX_COUNTER_
 
 char sokutei_counters[SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES] = {0};
 int sokutei_number_of_counters = 0;
+
+char sokutei_counter_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH] = {'\0'};
+
+void sokutei_integer_counter_to_string(SOKUTEI_INTEGER_COUNTER_TYPE integer){
+    sokutei_counter_to_string_buffer[0] = '1';
+    sokutei_counter_to_string_buffer[1] = '\0';
+}
+
+void sokutei_float_counter_to_string(SOKUTEI_FLOAT_COUNTER_TYPE integer){
+    sokutei_counter_to_string_buffer[0] = '1';
+    sokutei_counter_to_string_buffer[1] = '.';
+    sokutei_counter_to_string_buffer[2] = '2';
+    sokutei_counter_to_string_buffer[3] = '\0';
+}
+
+void sokutei_interval_timer_counter_to_string(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE integer){
+    sokutei_counter_to_string_buffer[0] = '8';
+    sokutei_counter_to_string_buffer[1] = '\0';
+}
+
+void sokutei_error_counter_to_string(){
+    sokutei_strcpy(sokutei_counter_to_string_buffer, "ERROR_CONVERTING");
+}
 
 ///--- Counters
 
