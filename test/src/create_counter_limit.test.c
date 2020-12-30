@@ -33,7 +33,6 @@ TEST sokutei_add_counter_should_not_add_a_new_non_existing_counter_and_should_re
     //when
     const int actual = sokutei_add_counter(counter_name, SOKUTEI_INTEGER_TYPE);
 
-    printf("%d\n", actual);
     //then
     ASSERT_EQ(expected, actual);
     ASSERT_EQ(sokutei_number_of_counters, expected_number_of_counters);
