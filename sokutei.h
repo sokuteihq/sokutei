@@ -66,6 +66,25 @@ char *sokutei_strcpy(char *string_a, const char *string_b){
 
 ///--- String functions
 
+/// Reporting settings
+#define SOKUTEI_JSON 0
+#define SOKUTEI_CSV 1
+
+#define SOKUTEI_REPORTING_FORMAT SOKUTEI_JSON
+
+#define sokutei_print_char(char) sokutei_print_char_handler(char)
+#define sokutei_print_string(string) sokutei_print_string_handler(string)
+
+#if SOKUTEI_REPORTING_FORMAT == SOKUTEI_JSON
+    #define sokutei_begin_report() sokutei_json_begin_report()
+    #define sokutei_report_iteration() sokutei_json_report_iteration()
+    #define sokutei_end_report() sokutei_json_end_report()
+#elif SOKUTEI_REPORTING_FORMAT == SOKUTEI_CSV
+    #define sokutei_begin_report() sokutei_csv_begin_report()
+    #define sokutei_report_iteration() sokutei_csv_report_iteration()
+    #define sokutei_end_report() sokutei_csv_end_report()
+#endif
+///--- Reporting settings
 
 /// Counters
 
