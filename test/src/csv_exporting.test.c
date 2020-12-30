@@ -72,7 +72,7 @@ TEST sokutei_begin_report_should_create_csv_report_with_one_counter(void)
     //given
 
     sokutei_add_counter("a", SOKUTEI_INTEGER_TYPE);
-    const char *expected = "a\n1\n";
+    const char *expected = "a\n0\n";
 
     //when
     sokutei_begin_report();
@@ -93,12 +93,13 @@ TEST sokutei_begin_report_should_create_csv_report_with_three_counters(void)
     sokutei_add_counter("a", SOKUTEI_INTEGER_TYPE);
     sokutei_add_counter("b", SOKUTEI_INTEGER_TYPE);
     sokutei_add_counter("c", SOKUTEI_INTEGER_TYPE);
-    const char *expected = "a,b,c\n1,1,1\n";
+    const char *expected = "a,b,c\n0,0,0\n";
 
     //when
     sokutei_begin_report();
     sokutei_report_iteration();
 
+    printf("|%s|", buffer);
     //then
     ASSERT_EQ(0, strcmp(expected, buffer));
     PASS();
@@ -112,7 +113,7 @@ TEST sokutei_begin_report_should_create_full_csv_report_for_two_iterations_with_
     sokutei_add_counter("a", SOKUTEI_INTEGER_TYPE);
     sokutei_add_counter("b", SOKUTEI_INTEGER_TYPE);
     sokutei_add_counter("c", SOKUTEI_INTEGER_TYPE);
-    const char *expected = "a,b,c\n1,1,1\n1,1,1\n";
+    const char *expected = "a,b,c\n0,0,0\n0,0,0\n";
 
     //when
     sokutei_begin_report();
