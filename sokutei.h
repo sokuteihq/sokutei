@@ -101,8 +101,27 @@ int sokutei_number_of_counters = 0;
 char sokutei_counter_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
 
 void sokutei_integer_counter_to_string(SOKUTEI_INTEGER_COUNTER_TYPE integer){
-    sokutei_counter_to_string_buffer[0] = '1';
-    sokutei_counter_to_string_buffer[1] = '\0';
+    int index = SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH;
+    sokutei_counter_to_string_buffer[index--] = '\0';
+    int digits = 0;
+
+    if(integer < 0){
+        sokutei_counter_to_string_buffer[0] = '-';
+        digits = 1;
+        integer *= -1;
+    }
+
+    do{
+        sokutei_counter_to_string_buffer[index--] = '0' + (integer % 10);
+        integer /= 10;
+    } while(integer);
+
+    index++;
+
+    while(index < SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH){
+        sokutei_counter_to_string_buffer[digits++] = sokutei_counter_to_string_buffer[index++];
+    }
+    sokutei_counter_to_string_buffer[digits] = '\0';
 }
 
 void sokutei_float_counter_to_string(SOKUTEI_FLOAT_COUNTER_TYPE integer){
