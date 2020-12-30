@@ -154,6 +154,7 @@ void sokutei_iteration_finish_handler(){
     for(index = 0; index < (SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES); index++){
         sokutei_counters[index] = 0;
     }
+    sokutei_current_iteration++;
 }
 
 ///--- Iterations
