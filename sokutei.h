@@ -98,7 +98,7 @@ char sokutei_counter_definitions[SOKUTEI_MAX_COUNTER_COUNT][SOKUTEI_MAX_COUNTER_
 char sokutei_counters[SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES] = {0};
 int sokutei_number_of_counters = 0;
 
-char sokutei_counter_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH] = {'\0'};
+char sokutei_counter_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
 
 void sokutei_integer_counter_to_string(SOKUTEI_INTEGER_COUNTER_TYPE integer){
     sokutei_counter_to_string_buffer[0] = '1';
