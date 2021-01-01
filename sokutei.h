@@ -108,9 +108,6 @@ char sokutei_counter_definitions[SOKUTEI_MAX_COUNTER_COUNT][SOKUTEI_MAX_COUNTER_
 char sokutei_counters[SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES] = {0};
 int sokutei_number_of_counters = 0;
 
-#define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
-
-
 int sokutei_integer_counter_to_string(char *target_buffer, SOKUTEI_INTEGER_COUNTER_TYPE integer){
     char local_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
     int index = SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH;
@@ -244,6 +241,8 @@ void sokutei_iteration_finish_handler(){
 
 /// Counter Getter and Setter functions
 
+#define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
+
 SOKUTEI_INTEGER_COUNTER_TYPE sokutei_integer_get_counter(const char *counter_name){
     const int index = sokutei_get_index_of_counter(counter_name);
 
@@ -318,13 +317,16 @@ void sokutei_print_string_handler(const char *string) {
 void sokutei_convert_counter_to_string(char *target_buffer, const int counter_index) {
     switch (sokutei_get_type_of(counter_index)) {
         case SOKUTEI_INTEGER_TYPE:
-            sokutei_integer_counter_to_string(target_buffer, counter_index);
+            SOKUTEI_INTEGER_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_INTEGER_COUNTER_TYPE, counter_index);
+            sokutei_integer_counter_to_string(target_buffer, counter_value);
             break;
         case SOKUTEI_FLOAT_TYPE:
-            sokutei_float_counter_to_string(target_buffer, counter_index);
+            SOKUTEI_FLOAT_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, counter_index);
+            sokutei_float_counter_to_string(target_buffer, counter_value);
             break;
         case SOKUTEI_INTERVAL_TYPE:
-            sokutei_interval_timer_counter_to_string(target_buffer, counter_index);
+            SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE, counter_index);
+            sokutei_interval_timer_counter_to_string(target_buffer, counter_value);
             break;
         
         default:
