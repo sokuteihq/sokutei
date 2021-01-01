@@ -109,45 +109,43 @@ int sokutei_number_of_counters = 0;
 #define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
 
 
-void sokutei_integer_counter_to_string(char *target_buffer, SOKUTEI_INTEGER_COUNTER_TYPE counter){
-    SOKUTEI_INTEGER_COUNTER_TYPE integer = *sokutei_counter_at_index(SOKUTEI_INTEGER_COUNTER_TYPE, counter_index);
+int sokutei_integer_counter_to_string(char *target_buffer, SOKUTEI_INTEGER_COUNTER_TYPE integer){
+    char local_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
     int index = SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH;
-    sokutei_counter_to_string_buffer[index--] = '\0';
-    int digits = 0;
-
+    int length = 0;
+    
     if(integer < 0){
-        sokutei_counter_to_string_buffer[0] = '-';
-        digits = 1;
+        target_buffer[0] = '-';
+        length = 1;
         integer *= -1;
     }
 
     do{
-        sokutei_counter_to_string_buffer[index--] = '0' + (integer % 10);
+        local_buffer[index--] = '0' + (integer % 10);
         integer /= 10;
     } while(integer);
 
     index++;
 
-    while(index < SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH){
-        sokutei_counter_to_string_buffer[digits++] = sokutei_counter_to_string_buffer[index++];
+    while(index <= SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH){
+        target_buffer[length++] = local_buffer[index++];
     }
-    sokutei_counter_to_string_buffer[digits] = '\0';
+    return length;
 }
 
-void sokutei_float_counter_to_string(char *target_buffer, SOKUTEI_FLOAT_COUNTER_TYPE floating_point){
-    sokutei_counter_to_string_buffer[0] = '1';
-    sokutei_counter_to_string_buffer[1] = '.';
-    sokutei_counter_to_string_buffer[2] = '2';
-    sokutei_counter_to_string_buffer[3] = '\0';
+int sokutei_float_counter_to_string(char *target_buffer, SOKUTEI_FLOAT_COUNTER_TYPE floating_point){
+    target_buffer[0] = '1';
+    target_buffer[1] = '.';
+    target_buffer[2] = '2';
+    target_buffer[3] = '\0';
 }
 
-void sokutei_interval_timer_counter_to_string(char *target_buffer, SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE interval){
-    sokutei_counter_to_string_buffer[0] = '8';
-    sokutei_counter_to_string_buffer[1] = '\0';
+int sokutei_interval_timer_counter_to_string(char *target_buffer, SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE interval){
+    target_buffer[0] = '8';
+    target_buffer[1] = '\0';
 }
 
 void sokutei_error_counter_to_string(){
-    sokutei_strcpy(sokutei_counter_to_string_buffer, "ERROR_CONVERTING");
 }
 
 ///--- Counters
