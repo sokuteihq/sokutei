@@ -104,6 +104,7 @@ char *sokutei_strcpy(char *string_a, const char *string_b){
  */
 char sokutei_counter_definitions[SOKUTEI_MAX_COUNTER_COUNT][SOKUTEI_MAX_COUNTER_NAME_LENGTH + SOKUTEI_TYPE_INDICATOR_PADDING] = {'\0'};
 
+#define sokutei_get_counter_name_at_index(index) sokutei_counter_definitions[index]
 
 char sokutei_counters[SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES] = {0};
 int sokutei_number_of_counters = 0;
@@ -352,7 +353,7 @@ void sokutei_json_report_iteration(){
             sokutei_print_string(",");
         }
         sokutei_print_string("\"");
-        sokutei_print_string(sokutei_counter_definitions[counter]);
+        sokutei_print_string(sokutei_get_counter_name_at_index(counter));
         sokutei_print_string("\":");
         sokutei_convert_counter_to_string(value_to_string_buffer, counter);
         sokutei_print_string(value_to_string_buffer);
@@ -370,7 +371,7 @@ void sokutei_csv_begin_report() {
         if(counter > 0) {
             sokutei_print_string(",");
         }
-        sokutei_print_string(sokutei_counter_definitions[counter]);
+        sokutei_print_string(sokutei_get_counter_name_at_index(counter));
     }
     sokutei_print_string("\n");
 }
