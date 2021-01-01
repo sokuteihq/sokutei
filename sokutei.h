@@ -136,10 +136,23 @@ int sokutei_integer_counter_to_string(char *target_buffer, SOKUTEI_INTEGER_COUNT
 }
 
 int sokutei_float_counter_to_string(char *target_buffer, SOKUTEI_FLOAT_COUNTER_TYPE floating_point){
-    target_buffer[0] = '1';
-    target_buffer[1] = '.';
-    target_buffer[2] = '2';
-    target_buffer[3] = '\0';
+    int digits = 0;
+    SOKUTEI_INTEGER_COUNTER_TYPE integer_part = floating_point;
+    floating_point -= integer_part;
+    digits = sokutei_integer_to_string(target_buffer, integer_part);
+
+    target_buffer[digits++] = '.';
+    int precision;
+    for (precision = 0; precision < SOKUTEI_COUNTER_TO_STRING_PRECISION - 1; precision++) 
+    {
+        floating_point *= 10;
+        integer_part = (SOKUTEI_INTEGER_COUNTER_TYPE) floating_point;
+        floating_point -= integer_part;
+        digits += sokutei_integer_to_string(target_buffer + digits, integer_part) ;
+    }
+    integer_part = floating_point *= 10;
+
+    return digits;
 }
 
 int sokutei_interval_timer_counter_to_string(char *target_buffer, SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE interval){
