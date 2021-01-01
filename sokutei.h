@@ -108,9 +108,8 @@ int sokutei_number_of_counters = 0;
 
 #define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
 
-char sokutei_counter_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
 
-void sokutei_integer_counter_to_string(int counter_index){
+void sokutei_integer_counter_to_string(char *target_buffer, SOKUTEI_INTEGER_COUNTER_TYPE counter){
     SOKUTEI_INTEGER_COUNTER_TYPE integer = *sokutei_counter_at_index(SOKUTEI_INTEGER_COUNTER_TYPE, counter_index);
     int index = SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH;
     sokutei_counter_to_string_buffer[index--] = '\0';
@@ -135,14 +134,14 @@ void sokutei_integer_counter_to_string(int counter_index){
     sokutei_counter_to_string_buffer[digits] = '\0';
 }
 
-void sokutei_float_counter_to_string(SOKUTEI_FLOAT_COUNTER_TYPE integer){
+void sokutei_float_counter_to_string(char *target_buffer, SOKUTEI_FLOAT_COUNTER_TYPE floating_point){
     sokutei_counter_to_string_buffer[0] = '1';
     sokutei_counter_to_string_buffer[1] = '.';
     sokutei_counter_to_string_buffer[2] = '2';
     sokutei_counter_to_string_buffer[3] = '\0';
 }
 
-void sokutei_interval_timer_counter_to_string(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE integer){
+void sokutei_interval_timer_counter_to_string(char *target_buffer, SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE interval){
     sokutei_counter_to_string_buffer[0] = '8';
     sokutei_counter_to_string_buffer[1] = '\0';
 }
@@ -303,21 +302,21 @@ void sokutei_print_char_handler(const char c) {
 void sokutei_print_string_handler(const char *string) {
 }
 
-void sokutei_convert_counter_to_string(const int counter_index) {
+void sokutei_convert_counter_to_string(char *target_buffer, const int counter_index) {
     switch (sokutei_get_type_of(counter_index)) {
-    case SOKUTEI_INTEGER_TYPE:
-        sokutei_integer_counter_to_string(counter_index);
-        break;
-    case SOKUTEI_FLOAT_TYPE:
-        sokutei_float_counter_to_string(counter_index);
-        break;
-    case SOKUTEI_INTERVAL_TYPE:
-        sokutei_interval_timer_counter_to_string(counter_index);
-        break;
-    
-    default:
-        sokutei_error_counter_to_string();
-        break;
+        case SOKUTEI_INTEGER_TYPE:
+            sokutei_integer_counter_to_string(target_buffer, counter_index);
+            break;
+        case SOKUTEI_FLOAT_TYPE:
+            sokutei_float_counter_to_string(target_buffer, counter_index);
+            break;
+        case SOKUTEI_INTERVAL_TYPE:
+            sokutei_interval_timer_counter_to_string(target_buffer, counter_index);
+            break;
+        
+        default:
+            sokutei_error_counter_to_string();
+            break;
     }
 }
 
@@ -331,6 +330,7 @@ void sokutei_json_report_iteration(){
         sokutei_print_string(",");
     }
     sokutei_print_string("{");
+    char sokutei_counter_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
     int counter;
     for(counter = 0; counter < sokutei_number_of_counters; counter++) {
         if(counter > 0) {
@@ -339,7 +339,7 @@ void sokutei_json_report_iteration(){
         sokutei_print_string("\"");
         sokutei_print_string(sokutei_counter_definitions[counter]);
         sokutei_print_string("\":");
-        sokutei_convert_counter_to_string(counter);
+        sokutei_convert_counter_to_string(sokutei_counter_to_string_buffer, counter);
         sokutei_print_string(sokutei_counter_to_string_buffer);
     }
     sokutei_print_string("}");
@@ -362,12 +362,13 @@ void sokutei_csv_begin_report() {
 
 
 void sokutei_csv_report_iteration(){
+    char sokutei_counter_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
     int counter;
     for(counter = 0; counter < sokutei_number_of_counters; counter++) {
         if(counter > 0) {
             sokutei_print_string(",");
         }
-        sokutei_convert_counter_to_string(counter);
+        sokutei_convert_counter_to_string(sokutei_counter_to_string_buffer, counter);
         sokutei_print_string(sokutei_counter_to_string_buffer);
     }
     sokutei_print_string("\n");
