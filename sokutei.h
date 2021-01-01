@@ -330,7 +330,7 @@ void sokutei_json_report_iteration(){
         sokutei_print_string(",");
     }
     sokutei_print_string("{");
-    char sokutei_counter_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
+    char value_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
     int counter;
     for(counter = 0; counter < sokutei_number_of_counters; counter++) {
         if(counter > 0) {
@@ -339,8 +339,8 @@ void sokutei_json_report_iteration(){
         sokutei_print_string("\"");
         sokutei_print_string(sokutei_counter_definitions[counter]);
         sokutei_print_string("\":");
-        sokutei_convert_counter_to_string(sokutei_counter_to_string_buffer, counter);
-        sokutei_print_string(sokutei_counter_to_string_buffer);
+        sokutei_convert_counter_to_string(value_to_string_buffer, counter);
+        sokutei_print_string(value_to_string_buffer);
     }
     sokutei_print_string("}");
 }
@@ -362,14 +362,14 @@ void sokutei_csv_begin_report() {
 
 
 void sokutei_csv_report_iteration(){
-    char sokutei_counter_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
+    char value_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
     int counter;
     for(counter = 0; counter < sokutei_number_of_counters; counter++) {
         if(counter > 0) {
             sokutei_print_string(",");
         }
-        sokutei_convert_counter_to_string(sokutei_counter_to_string_buffer, counter);
-        sokutei_print_string(sokutei_counter_to_string_buffer);
+        sokutei_convert_counter_to_string(value_to_string_buffer, counter);
+        sokutei_print_string(value_to_string_buffer);
     }
     sokutei_print_string("\n");
 }
