@@ -137,7 +137,7 @@ int sokutei_float_counter_to_string(char *target_buffer, SOKUTEI_FLOAT_COUNTER_T
     int digits = 0;
     SOKUTEI_INTEGER_COUNTER_TYPE integer_part = floating_point;
     floating_point -= integer_part;
-    digits = sokutei_integer_to_string(target_buffer, integer_part);
+    digits = sokutei_integer_counter_to_string(target_buffer, integer_part);
 
     target_buffer[digits++] = '.';
     int precision;
@@ -146,7 +146,7 @@ int sokutei_float_counter_to_string(char *target_buffer, SOKUTEI_FLOAT_COUNTER_T
         floating_point *= 10;
         integer_part = (SOKUTEI_INTEGER_COUNTER_TYPE) floating_point;
         floating_point -= integer_part;
-        digits += sokutei_integer_to_string(target_buffer + digits, integer_part) ;
+        digits += sokutei_integer_counter_to_string(target_buffer + digits, integer_part) ;
     }
     integer_part = floating_point *= 10;
 
