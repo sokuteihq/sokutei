@@ -190,7 +190,7 @@ inline int sokutei_is_unknown_counter_type(const char type){
 
 
 inline int sokutei_is_counter_limit_reached(){
-    return sokutei_number_of_counters + 1 >= SOKUTEI_MAX_COUNTER_COUNT;
+    return sokutei_number_of_counters >= SOKUTEI_MAX_COUNTER_COUNT;
 }
 
 
