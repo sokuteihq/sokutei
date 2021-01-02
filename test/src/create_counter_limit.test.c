@@ -4,7 +4,7 @@
 TEST sokutei_add_counter_should_add_the_maximal_number_of_counters_without_error(void)
 {
     //given
-    const char *counter_name = "0";
+    char counter_name[2] ={'0', '\0'} ;
     const int expected = 0;
     int current;
 
@@ -18,7 +18,7 @@ TEST sokutei_add_counter_should_add_the_maximal_number_of_counters_without_error
         //then
         ASSERT_EQ(expected, actual);
         ASSERT_EQ(sokutei_number_of_counters, expected_number_of_counters);
-        counter_name++;
+        (*counter_name)++;
     }
     PASS();
 }
