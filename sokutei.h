@@ -316,23 +316,18 @@ void sokutei_print_string_handler(const char *string) {
 }
 
 void sokutei_convert_counter_to_string(char *target_buffer, const int counter_index) {
-    switch (sokutei_get_type_of(counter_index)) {
-        case SOKUTEI_INTEGER_TYPE:
-            SOKUTEI_INTEGER_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_INTEGER_COUNTER_TYPE, counter_index);
-            sokutei_integer_counter_to_string(target_buffer, counter_value);
-            break;
-        case SOKUTEI_FLOAT_TYPE:
-            SOKUTEI_FLOAT_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, counter_index);
-            sokutei_float_counter_to_string(target_buffer, counter_value);
-            break;
-        case SOKUTEI_INTERVAL_TYPE:
-            SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE, counter_index);
-            sokutei_interval_timer_counter_to_string(target_buffer, counter_value);
-            break;
-        
-        default:
-            sokutei_error_counter_to_string();
-            break;
+    int type_of_counter = sokutei_get_type_of(counter_index);
+    if(type_of_counter == SOKUTEI_INTEGER_TYPE) {
+        SOKUTEI_INTEGER_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_INTEGER_COUNTER_TYPE, counter_index);
+        sokutei_integer_counter_to_string(target_buffer, counter_value);
+    } else if(type_of_counter ==  SOKUTEI_FLOAT_TYPE) {
+        SOKUTEI_FLOAT_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, counter_index);
+        sokutei_float_counter_to_string(target_buffer, counter_value);
+    } else if(type_of_counter == SOKUTEI_INTERVAL_TYPE) {
+        SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE, counter_index);
+        sokutei_interval_timer_counter_to_string(target_buffer, counter_value);
+    } else {
+        sokutei_error_counter_to_string();
     }
 }
 
