@@ -77,11 +77,11 @@ char *sokutei_strcpy(char *string_a, const char *string_b){
 #endif
 
 
-#ifndef SOKUTEI_REPORTING_FORMAT
+#ifndef sokutei_print_char
 #define sokutei_print_char(char) sokutei_print_char_handler(char)
 #endif
 
-#ifndef SOKUTEI_REPORTING_FORMAT
+#ifndef sokutei_print_string
 #define sokutei_print_string(string) sokutei_print_string_handler(string)
 #endif
 
