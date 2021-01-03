@@ -5,6 +5,9 @@
 #define SOKUTEI_MAX_COUNTER_COUNT  100
 #define SOKUTEI_MAX_COUNTER_NAME_LENGTH 30
 
+#define SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH 64
+#define SOKUTEI_COUNTER_TO_STRING_PRECISION 15
+
 #define SOKUTEI_INTEGER_COUNTER_TYPE int
 #define SOKUTEI_FLOAT_COUNTER_TYPE double
 #define SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE int
@@ -65,6 +68,33 @@ char *sokutei_strcpy(char *string_a, const char *string_b){
 
 ///--- String functions
 
+/// Reporting settings
+#define SOKUTEI_JSON 0
+#define SOKUTEI_CSV 1
+
+#ifndef SOKUTEI_REPORTING_FORMAT
+    #define SOKUTEI_REPORTING_FORMAT SOKUTEI_JSON
+#endif
+
+
+#ifndef SOKUTEI_REPORTING_FORMAT
+#define sokutei_print_char(char) sokutei_print_char_handler(char)
+#endif
+
+#ifndef SOKUTEI_REPORTING_FORMAT
+#define sokutei_print_string(string) sokutei_print_string_handler(string)
+#endif
+
+#if SOKUTEI_REPORTING_FORMAT == SOKUTEI_JSON
+    #define sokutei_begin_report() sokutei_json_begin_report()
+    #define sokutei_report_iteration() sokutei_json_report_iteration()
+    #define sokutei_end_report() sokutei_json_end_report()
+#elif SOKUTEI_REPORTING_FORMAT == SOKUTEI_CSV
+    #define sokutei_begin_report() sokutei_csv_begin_report()
+    #define sokutei_report_iteration() sokutei_csv_report_iteration()
+    #define sokutei_end_report() sokutei_csv_end_report()
+#endif
+///--- Reporting settings
 
 /// Counters
 
@@ -74,17 +104,67 @@ char *sokutei_strcpy(char *string_a, const char *string_b){
  */
 char sokutei_counter_definitions[SOKUTEI_MAX_COUNTER_COUNT][SOKUTEI_MAX_COUNTER_NAME_LENGTH + SOKUTEI_TYPE_INDICATOR_PADDING] = {'\0'};
 
+#define sokutei_get_counter_name_at_index(index) sokutei_counter_definitions[index]
 
 char sokutei_counters[SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES] = {0};
 int sokutei_number_of_counters = 0;
+
+int sokutei_integer_counter_to_string(char *target_buffer, SOKUTEI_INTEGER_COUNTER_TYPE integer){
+    char local_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
+    int index = SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH;
+    int length = 0;
+    
+    if(integer < 0){
+        target_buffer[0] = '-';
+        length = 1;
+        integer *= -1;
+    }
+
+    do{
+        local_buffer[index--] = '0' + (integer % 10);
+        integer /= 10;
+    } while(integer);
+
+    index++;
+
+    while(index <= SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH){
+        target_buffer[length++] = local_buffer[index++];
+    }
+    return length;
+}
+
+int sokutei_float_counter_to_string(char *target_buffer, SOKUTEI_FLOAT_COUNTER_TYPE floating_point){
+    int digits = 0;
+    SOKUTEI_INTEGER_COUNTER_TYPE integer_part = floating_point;
+    floating_point -= integer_part;
+    digits = sokutei_integer_counter_to_string(target_buffer, integer_part);
+
+    target_buffer[digits++] = '.';
+    int precision;
+    for (precision = 0; precision < SOKUTEI_COUNTER_TO_STRING_PRECISION - 1; precision++) 
+    {
+        floating_point *= 10;
+        integer_part = (SOKUTEI_INTEGER_COUNTER_TYPE) floating_point;
+        floating_point -= integer_part;
+        digits += sokutei_integer_counter_to_string(target_buffer + digits, integer_part) ;
+    }
+    integer_part = floating_point *= 10;
+
+    return digits;
+}
+
+int sokutei_interval_timer_counter_to_string(char *target_buffer, SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE interval){
+    target_buffer[0] = '8';
+    target_buffer[1] = '\0';
+}
+
+void sokutei_error_counter_to_string(){
+}
 
 ///--- Counters
 
 
 /// Low level counter handling
-
-#define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
-
 
 
 char sokutei_get_type_of(const int index){
@@ -110,7 +190,7 @@ inline int sokutei_is_unknown_counter_type(const char type){
 
 
 inline int sokutei_is_counter_limit_reached(){
-    return sokutei_number_of_counters + 1 >= SOKUTEI_MAX_COUNTER_COUNT;
+    return sokutei_number_of_counters >= SOKUTEI_MAX_COUNTER_COUNT;
 }
 
 
@@ -154,12 +234,15 @@ void sokutei_iteration_finish_handler(){
     for(index = 0; index < (SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES); index++){
         sokutei_counters[index] = 0;
     }
+    sokutei_current_iteration++;
 }
 
 ///--- Iterations
 
 
 /// Counter Getter and Setter functions
+
+#define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
 
 SOKUTEI_INTEGER_COUNTER_TYPE sokutei_integer_get_counter(const char *counter_name){
     const int index = sokutei_get_index_of_counter(counter_name);
@@ -224,6 +307,89 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
 ///--- Counter Getter and Setter functions
 
 
+/// Reporting functions
+
+void sokutei_print_char_handler(const char c) {
+}
+
+void sokutei_print_string_handler(const char *string) {
+}
+
+void sokutei_convert_counter_to_string(char *target_buffer, const int counter_index) {
+    int type_of_counter = sokutei_get_type_of(counter_index);
+    if(type_of_counter == SOKUTEI_INTEGER_TYPE) {
+        SOKUTEI_INTEGER_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_INTEGER_COUNTER_TYPE, counter_index);
+        sokutei_integer_counter_to_string(target_buffer, counter_value);
+    } else if(type_of_counter ==  SOKUTEI_FLOAT_TYPE) {
+        SOKUTEI_FLOAT_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, counter_index);
+        sokutei_float_counter_to_string(target_buffer, counter_value);
+    } else if(type_of_counter == SOKUTEI_INTERVAL_TYPE) {
+        SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE, counter_index);
+        sokutei_interval_timer_counter_to_string(target_buffer, counter_value);
+    } else {
+        sokutei_error_counter_to_string();
+    }
+}
+
+
+void sokutei_json_begin_report() {
+    sokutei_print_string("[");
+}
+
+void sokutei_json_report_iteration(){
+    if(sokutei_current_iteration > 0) {
+        sokutei_print_string(",");
+    }
+    sokutei_print_string("{");
+    char value_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
+    int counter;
+    for(counter = 0; counter < sokutei_number_of_counters; counter++) {
+        if(counter > 0) {
+            sokutei_print_string(",");
+        }
+        sokutei_print_string("\"");
+        sokutei_print_string(sokutei_get_counter_name_at_index(counter));
+        sokutei_print_string("\":");
+        sokutei_convert_counter_to_string(value_to_string_buffer, counter);
+        sokutei_print_string(value_to_string_buffer);
+    }
+    sokutei_print_string("}");
+}
+
+void sokutei_json_end_report(){
+    sokutei_print_string("]");
+}
+
+void sokutei_csv_begin_report() {
+    int counter;
+    for(counter = 0; counter < sokutei_number_of_counters; counter++) {
+        if(counter > 0) {
+            sokutei_print_string(",");
+        }
+        sokutei_print_string(sokutei_get_counter_name_at_index(counter));
+    }
+    sokutei_print_string("\n");
+}
+
+
+void sokutei_csv_report_iteration(){
+    char value_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
+    int counter;
+    for(counter = 0; counter < sokutei_number_of_counters; counter++) {
+        if(counter > 0) {
+            sokutei_print_string(",");
+        }
+        sokutei_convert_counter_to_string(value_to_string_buffer, counter);
+        sokutei_print_string(value_to_string_buffer);
+    }
+    sokutei_print_string("\n");
+}
+
+void sokutei_csv_end_report(){
+    ;
+}
+
+///--- Reporting functions
 
 ///------------ Sokutei API ----
 
@@ -256,4 +422,3 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
 
 
 #endif //END OF SOKUTEI_BENCHMARK_H
-
