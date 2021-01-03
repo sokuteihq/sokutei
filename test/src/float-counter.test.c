@@ -7,7 +7,7 @@ TEST float_get_counter_should_return_with_not_found_if_nonexist_counter_is_given
     const int expected = SOKUTEI_NOT_FOUND;
 
     //when
-    const int actual = sokutei_get_integer_counter("nonexist");
+    const int actual = sokutei_get_float_counter("nonexist");
 
     //then
     ASSERT_EQ(expected, actual);
@@ -21,8 +21,8 @@ TEST float_get_counter_should_return_with_the_initial_value_zero_if_a_valid_coun
     const SOKUTEI_FLOAT_COUNTER_TYPE expected = 0;
 
     //when
-    sokutei_create_integer_counter(counter_name);
-    const SOKUTEI_FLOAT_COUNTER_TYPE actual = sokutei_get_integer_counter(counter_name);
+    sokutei_create_float_counter(counter_name);
+    const SOKUTEI_FLOAT_COUNTER_TYPE actual = sokutei_get_float_counter(counter_name);
 
     //then
     ASSERT_EQ(expected, actual);
@@ -36,9 +36,9 @@ TEST float_get_counter_should_return_with_the_incremented_value(void) {
     const SOKUTEI_FLOAT_COUNTER_TYPE expected = 1.0;
 
     //when
-    sokutei_create_integer_counter(counter_name);
-    sokutei_increment_integer_counter(counter_name);
-    const SOKUTEI_FLOAT_COUNTER_TYPE actual = sokutei_get_integer_counter(counter_name);
+    sokutei_create_float_counter(counter_name);
+    sokutei_increment_float_counter(counter_name);
+    const SOKUTEI_FLOAT_COUNTER_TYPE actual = sokutei_get_float_counter(counter_name);
 
     //then
     ASSERT_EQ(expected, actual);
@@ -53,9 +53,9 @@ TEST float_get_counter_should_return_with_the_altered_value(void) {
     const SOKUTEI_FLOAT_COUNTER_TYPE expected = increment_with;
 
     //when
-    sokutei_create_integer_counter(counter_name);
-    sokutei_alter_integer_counter(counter_name, increment_with);
-    const SOKUTEI_FLOAT_COUNTER_TYPE actual = sokutei_get_integer_counter(counter_name);
+    sokutei_create_float_counter(counter_name);
+    sokutei_alter_float_counter(counter_name, increment_with);
+    const SOKUTEI_FLOAT_COUNTER_TYPE actual = sokutei_get_float_counter(counter_name);
 
     //then
     ASSERT_EQ(expected, actual);
