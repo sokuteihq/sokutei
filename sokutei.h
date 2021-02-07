@@ -1,6 +1,26 @@
 #ifndef SOKUTEI_BENCHMARK_H
 #define SOKUTEI_BENCHMARK_H
 
+
+/// Determine operating system
+#ifndef SOKUTEI_OS_TYPE
+    #if (defined(__NVCC__)) // CUDA
+        #define SOKUTEI_OS_TYPE 1
+    #elif defined(linux) || defined(_linux) || defined(__linux__) || defined(__unix__) // Linux
+        #define SOKUTEI_OS_TYPE 2
+    #elif defined(_WIN32) || defined(_WIN64) || defined(_WINDOWS) || defined(__WINDOWS__) // Windows
+        #define SOKUTEI_OS_TYPE 3
+    #elif (defined(__MACH__) && defined(__APPLE__)) // MacOs
+        #define SOKUTEI_OS_TYPE 4
+    #elif defined(ARDUINO) // Arduino
+        #define SOKUTEI_OS_TYPE 5
+    #else // Default
+        #define SOKUTEI_OS_TYPE 0
+    #endif
+#endif
+///--- Determine operating system
+
+
 #define SOKUTEI_MAX_MEASURED_ITERATIONS 10
 #define SOKUTEI_MAX_COUNTER_COUNT  100
 #define SOKUTEI_MAX_COUNTER_NAME_LENGTH 30
@@ -113,7 +133,6 @@ int sokutei_integer_counter_to_string(char *target_buffer, SOKUTEI_INTEGER_COUNT
     char local_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
     int index = SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH;
     int length = 0;
-    
     if(integer < 0){
         target_buffer[0] = '-';
         length = 1;
@@ -141,8 +160,7 @@ int sokutei_float_counter_to_string(char *target_buffer, SOKUTEI_FLOAT_COUNTER_T
 
     target_buffer[digits++] = '.';
     int precision;
-    for (precision = 0; precision < SOKUTEI_COUNTER_TO_STRING_PRECISION - 1; precision++) 
-    {
+    for (precision = 0; precision < SOKUTEI_COUNTER_TO_STRING_PRECISION - 1; precision++){
         floating_point *= 10;
         integer_part = (SOKUTEI_INTEGER_COUNTER_TYPE) floating_point;
         floating_point -= integer_part;
@@ -300,7 +318,6 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
         // TODO call error
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
-    
     return *sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, index) += by;
 }
 
