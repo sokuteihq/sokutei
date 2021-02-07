@@ -355,6 +355,30 @@ SOKUTEI_TIMER_TYPE *sokutei_get_timer_counter(const char *counter_name){
     return sokutei_counter_at_index(SOKUTEI_TIMER_TYPE, index);
 }
 
+#ifndef SOKUTEI_TIMER_START
+    #if SOKUTEI_OS_TYPE == 1
+        void sokutei_timer_start_function(char *counter_name){
+            SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+            cudaEventCreate(&(counter->start));
+            cudaEventCreate(&(counter->stop));
+            cudaEventRecord(counter->start);
+        }
+    #elif SOKUTEI_OS_TYPE == 2 || SOKUTEI_OS_TYPE == 3
+        void sokutei_timer_start_function(char *counter_name){
+            SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+            counter->last_start = clock();
+        }
+    #elif SOKUTEI_OS_TYPE == 4
+        //TODO mac
+
+    #elif SOKUTEI_OS_TYPE == 5 // arduino
+        void sokutei_timer_start_function(char *counter_name){
+            SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+            counter->last_start = millis();
+        }
+    #endif
+    #define SOKUTEI_TIMER_START sokutei_timer_start_function
+#endif
 
 ///--- Timer counter functions
 
