@@ -196,10 +196,6 @@ int sokutei_float_counter_to_string(char *target_buffer, SOKUTEI_FLOAT_COUNTER_T
     return digits;
 }
 
-int sokutei_interval_timer_counter_to_string(char *target_buffer, SOKUTEI_TIMER_COUNTER_TYPE interval){
-    target_buffer[0] = '8';
-    target_buffer[1] = '\0';
-}
 
 void sokutei_error_counter_to_string(){
 }
