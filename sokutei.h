@@ -20,8 +20,6 @@
 #endif
 ///--- Determine operating system
 
-
-#define SOKUTEI_MAX_MEASURED_ITERATIONS 10
 #define SOKUTEI_MAX_COUNTER_COUNT  100
 #define SOKUTEI_MAX_COUNTER_NAME_LENGTH 30
 
@@ -240,9 +238,6 @@ int sokutei_add_counter(const char *counter_name, const char type){
 
 
 /// Iterations
-
-int sokutei_number_of_iterations =
-        SOKUTEI_MAX_MEASURED_ITERATIONS;
 
 int sokutei_current_iteration = 0;
 
