@@ -407,25 +407,11 @@ SOKUTEI_TIMER_TYPE *sokutei_get_timer_counter(const char *counter_name){
     #define SOKUTEI_TIMER_STOP sokutei_timer_stop_function
 #endif
 
-#ifndef SOKUTEI_TIMER_TO_STRING
-    #if SOKUTEI_OS_TYPE == 1
-        void sokutei_timer_to_string(char *buffer, SOKUTEI_TIMER_COUNTER_TYPE *counter){
-            sokutei_integer_counter_to_string(buffer, counter->elapsed);
-        }
-    #elif SOKUTEI_OS_TYPE == 2 || SOKUTEI_OS_TYPE == 3
-    void sokutei_timer_to_string(char *buffer, SOKUTEI_TIMER_COUNTER_TYPE *counter){
-        // seconds, miliseconds to print??? OS specific
-        sokutei_integer_counter_to_string(buffer, counter->elapsed);
-    }
-    #elif SOKUTEI_OS_TYPE == 4
-    //TODO mac
-    #elif SOKUTEI_OS_TYPE == 5 // arduino
-        void sokutei_timer_to_string(char *buffer, SOKUTEI_TIMER_COUNTER_TYPE *counter){
-            sokutei_integer_counter_to_string(buffer, counter->elapsed);
-        }
-    #endif
-    #define SOKUTEI_TIMER_TO_STRING sokutei_timer_to_string
-#endif
+void sokutei_timer_to_string(char *buffer, SOKUTEI_TIMER_COUNTER_TYPE *counter){
+    // seconds, miliseconds to print??? OS specific
+    sokutei_integer_counter_to_string(buffer, counter->elapsed);
+}
+
 ///--- Timer counter functions
 
 /// Reporting functions
@@ -446,7 +432,7 @@ void sokutei_convert_counter_to_string(char *target_buffer, const int counter_in
         sokutei_float_counter_to_string(target_buffer, counter_value);
     } else if(type_of_counter == SOKUTEI_INTERVAL_TYPE) {
         SOKUTEI_TIMER_COUNTER_TYPE *counter_value = sokutei_counter_at_index(SOKUTEI_TIMER_COUNTER_TYPE, counter_index);
-        SOKUTEI_TIMER_TO_STRING(target_buffer, counter_value);
+        sokutei_timer_to_string(target_buffer, counter_value);
     } else {
         sokutei_error_counter_to_string();
     }
