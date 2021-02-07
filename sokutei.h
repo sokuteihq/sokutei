@@ -5,18 +5,109 @@
 /// Determine operating system
 #ifndef SOKUTEI_OS_TYPE
     #if (defined(__NVCC__)) // CUDA
-        #define SOKUTEI_OS_TYPE 1
+    
+        typedef struct couter_type{
+            cudaEvent_t start;
+            cudaEvent_t stop;
+            unsigned int elapsed;
+        } SOKUTEI_TIMER_TYPE;
+
+        SOKUTEI_TIMER_TYPE *sokutei_get_timer_counter(const char *);
+
+        void sokutei_timer_start_function(char *counter_name){
+            SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+            cudaEventCreate(&(counter->start));
+            cudaEventCreate(&(counter->stop));
+            cudaEventRecord(counter->start);
+        }
+
+        void sokutei_timer_start_function(char *counter_name){
+                SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+                cudaEventRecord(counter->stop);
+                cudaEventSynchronize(counter->stop);
+                cudaEventElapsedTime(&(counter->elapsed), counter->start, counter->stop);
+        }
+
+
     #elif defined(linux) || defined(_linux) || defined(__linux__) || defined(__unix__) // Linux
-        #define SOKUTEI_OS_TYPE 2
+
+        #include <time.h>
+        typedef struct counter_type {
+            clock_t elapsed;
+            clock_t last_start;
+        } SOKUTEI_TIMER_TYPE;
+
+        SOKUTEI_TIMER_TYPE *sokutei_get_timer_counter(const char *);
+        void sokutei_timer_start_function(char *counter_name){
+            SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+            counter->last_start = clock();
+        }
+
+        void sokutei_timer_stop_function(char *counter_name){
+            SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+            counter->elapsed += clock() - counter->last_start;
+            counter->last_start = 0;
+        }
+
     #elif defined(_WIN32) || defined(_WIN64) || defined(_WINDOWS) || defined(__WINDOWS__) // Windows
-        #define SOKUTEI_OS_TYPE 3
+
+        #include <time.h>
+        typedef struct counter_type {
+            clock_t elapsed;
+            clock_t last_start;
+        } SOKUTEI_TIMER_TYPE;
+
+        SOKUTEI_TIMER_TYPE *sokutei_get_timer_counter(const char *);
+
+        void sokutei_timer_start_function(char *counter_name){
+            SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+            counter->last_start = clock();
+        }
+
+        void sokutei_timer_stop_function(char *counter_name){
+            SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+            counter->elapsed += clock() - counter->last_start;
+            counter->last_start = 0;
+        }
+
     #elif (defined(__MACH__) && defined(__APPLE__)) // MacOs
         #define SOKUTEI_OS_TYPE 4
+
     #elif defined(ARDUINO) // Arduino
-        #define SOKUTEI_OS_TYPE 5
+
+        typedef struct counter_type {
+            unsigned long elapsed;
+            unsigned long last_start;
+        } SOKUTEI_TIMER_TYPE;
+
+        void sokutei_timer_start_function(char *counter_name){
+
+            SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+            counter->last_start = millis();
+        }
+
+        void sokutei_timer_stop_function(char *counter_name){
+            SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+            counter->elapsed += millis() - counter->last_start;
+            counter->last_start = 0;
+        }
+
     #else // Default
         #define SOKUTEI_OS_TYPE 0
     #endif
+
+    #ifndef SOKUTEI_TIMER_COUNTER_TYPE
+        #define SOKUTEI_TIMER_COUNTER_TYPE SOKUTEI_TIMER_TYPE
+    #endif
+
+    #ifndef SOKUTEI_TIMER_START
+        #define SOKUTEI_TIMER_START sokutei_timer_start_function
+    #endif
+
+    #ifndef SOKUTEI_TIMER_STOP
+        #define SOKUTEI_TIMER_STOP sokutei_timer_stop_function
+    #endif
+
 #endif
 ///--- Determine operating system
 
@@ -29,33 +120,6 @@
 #define SOKUTEI_INTEGER_COUNTER_TYPE int
 #define SOKUTEI_FLOAT_COUNTER_TYPE double
 
-#ifndef SOKUTEI_TIMER_COUNTER_TYPE
-    #if SOKUTEI_OS_TYPE == 1
-        typedef struct couter_type{
-            cudaEvent_t start;
-            cudaEvent_t stop;
-            unsigned int elapsed;
-        };
-
-    #elif SOKUTEI_OS_TYPE == 2 || SOKUTEI_OS_TYPE == 3
-        #include <time.h>
-        typedef struct counter_type {
-            clock_t elapsed;
-            clock_t last_start;
-        } SOKUTEI_TIMER_TYPE;
-
-    #elif SOKUTEI_OS_TYPE == 4
-    //TODO mac
-
-    #elif SOKUTEI_OS_TYPE == 5
-        typedef struct counter_type {
-            unsigned long elapsed;
-            unsigned long last_start;
-        } SOKUTEI_TIMER_TYPE;
-    #endif
-
-    #define SOKUTEI_TIMER_COUNTER_TYPE SOKUTEI_TIMER_TYPE
-#endif
 
 #define MAX_SIZE_OF_TYPES   ((sizeof(SOKUTEI_INTEGER_COUNTER_TYPE) > sizeof(SOKUTEI_FLOAT_COUNTER_TYPE)) \
                             ? ((sizeof(SOKUTEI_INTEGER_COUNTER_TYPE) > sizeof(SOKUTEI_TIMER_COUNTER_TYPE)) \
@@ -354,58 +418,6 @@ SOKUTEI_TIMER_TYPE *sokutei_get_timer_counter(const char *counter_name){
     }
     return sokutei_counter_at_index(SOKUTEI_TIMER_TYPE, index);
 }
-
-#ifndef SOKUTEI_TIMER_START
-    #if SOKUTEI_OS_TYPE == 1
-        void sokutei_timer_start_function(char *counter_name){
-            SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
-            cudaEventCreate(&(counter->start));
-            cudaEventCreate(&(counter->stop));
-            cudaEventRecord(counter->start);
-        }
-    #elif SOKUTEI_OS_TYPE == 2 || SOKUTEI_OS_TYPE == 3
-        void sokutei_timer_start_function(char *counter_name){
-            SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
-            counter->last_start = clock();
-        }
-    #elif SOKUTEI_OS_TYPE == 4
-        //TODO mac
-
-    #elif SOKUTEI_OS_TYPE == 5 // arduino
-        void sokutei_timer_start_function(char *counter_name){
-            SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
-            counter->last_start = millis();
-        }
-    #endif
-    #define SOKUTEI_TIMER_START sokutei_timer_start_function
-#endif
-
-
-#ifndef SOKUTEI_TIMER_STOP
-    #if SOKUTEI_OS_TYPE == 1
-        void sokutei_timer_start_function(char *counter_name){
-                SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
-                cudaEventRecord(counter->stop);
-                cudaEventSynchronize(counter->stop);
-                cudaEventElapsedTime(&(counter->elapsed), counter->start, counter->stop);
-        }
-    #elif SOKUTEI_OS_TYPE == 2 || SOKUTEI_OS_TYPE == 3
-        void sokutei_timer_stop_function(char *counter_name){
-            SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
-            counter->elapsed += clock() - counter->last_start;
-            counter->last_start = 0;
-        }
-    #elif SOKUTEI_OS_TYPE == 4
-        //TODO mac
-    #elif SOKUTEI_OS_TYPE == 5 // arduino
-        void sokutei_timer_stop_function(char *counter_name){
-            SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
-            counter->elapsed += millis() - counter->last_start;
-            counter->last_start = 0;
-        }
-    #endif
-    #define SOKUTEI_TIMER_STOP sokutei_timer_stop_function
-#endif
 
 void sokutei_timer_to_string(char *buffer, SOKUTEI_TIMER_COUNTER_TYPE *counter){
     // seconds, miliseconds to print??? OS specific
