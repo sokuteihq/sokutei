@@ -29,7 +29,33 @@
 #define SOKUTEI_INTEGER_COUNTER_TYPE int
 #define SOKUTEI_FLOAT_COUNTER_TYPE double
 
-#define SOKUTEI_TIMER_COUNTER_TYPE int
+#ifndef SOKUTEI_TIMER_COUNTER_TYPE
+    #if SOKUTEI_OS_TYPE == 1
+        typedef struct couter_type{
+            cudaEvent_t start;
+            cudaEvent_t stop;
+            unsigned int elapsed;
+        };
+
+    #elif SOKUTEI_OS_TYPE == 2 || SOKUTEI_OS_TYPE == 3
+        #include <time.h>
+        typedef struct counter_type {
+            clock_t elapsed;
+            clock_t last_start;
+        } SOKUTEI_TIMER_TYPE;
+
+    #elif SOKUTEI_OS_TYPE == 4
+    //TODO mac
+
+    #elif SOKUTEI_OS_TYPE == 5
+        typedef struct counter_type {
+            unsigned long elapsed;
+            unsigned long last_start;
+        } SOKUTEI_TIMER_TYPE;
+    #endif
+
+    #define SOKUTEI_TIMER_COUNTER_TYPE SOKUTEI_TIMER_TYPE
+#endif
 
 #define MAX_SIZE_OF_TYPES   ((sizeof(SOKUTEI_INTEGER_COUNTER_TYPE) > sizeof(SOKUTEI_FLOAT_COUNTER_TYPE)) \
                             ? ((sizeof(SOKUTEI_INTEGER_COUNTER_TYPE) > sizeof(SOKUTEI_TIMER_COUNTER_TYPE)) \
