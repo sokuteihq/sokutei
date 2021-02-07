@@ -445,8 +445,8 @@ void sokutei_convert_counter_to_string(char *target_buffer, const int counter_in
         SOKUTEI_FLOAT_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, counter_index);
         sokutei_float_counter_to_string(target_buffer, counter_value);
     } else if(type_of_counter == SOKUTEI_INTERVAL_TYPE) {
-        SOKUTEI_TIMER_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_TIMER_COUNTER_TYPE, counter_index);
-        sokutei_interval_timer_counter_to_string(target_buffer, counter_value);
+        SOKUTEI_TIMER_COUNTER_TYPE *counter_value = sokutei_counter_at_index(SOKUTEI_TIMER_COUNTER_TYPE, counter_index);
+        SOKUTEI_TIMER_TO_STRING(target_buffer, counter_value);
     } else {
         sokutei_error_counter_to_string();
     }
