@@ -28,15 +28,16 @@
 
 #define SOKUTEI_INTEGER_COUNTER_TYPE int
 #define SOKUTEI_FLOAT_COUNTER_TYPE double
-#define SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE int
+
+#define SOKUTEI_TIMER_COUNTER_TYPE int
 
 #define MAX_SIZE_OF_TYPES   ((sizeof(SOKUTEI_INTEGER_COUNTER_TYPE) > sizeof(SOKUTEI_FLOAT_COUNTER_TYPE)) \
-                            ? ((sizeof(SOKUTEI_INTEGER_COUNTER_TYPE) > sizeof(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE)) \
+                            ? ((sizeof(SOKUTEI_INTEGER_COUNTER_TYPE) > sizeof(SOKUTEI_TIMER_COUNTER_TYPE)) \
                                 ? sizeof(SOKUTEI_INTEGER_COUNTER_TYPE) \
-                                : sizeof(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE))\
-                            : ((sizeof(SOKUTEI_FLOAT_COUNTER_TYPE) > sizeof(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE)) \
+                                : sizeof(SOKUTEI_TIMER_COUNTER_TYPE))\
+                            : ((sizeof(SOKUTEI_FLOAT_COUNTER_TYPE) > sizeof(SOKUTEI_TIMER_COUNTER_TYPE)) \
                                 ? sizeof(SOKUTEI_FLOAT_COUNTER_TYPE) \
-                                : sizeof(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE)))
+                                : sizeof(SOKUTEI_TIMER_COUNTER_TYPE)))
 
 #define SOKUTEI_INTEGER_TYPE '1'
 #define SOKUTEI_FLOAT_TYPE '2'
@@ -169,7 +170,7 @@ int sokutei_float_counter_to_string(char *target_buffer, SOKUTEI_FLOAT_COUNTER_T
     return digits;
 }
 
-int sokutei_interval_timer_counter_to_string(char *target_buffer, SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE interval){
+int sokutei_interval_timer_counter_to_string(char *target_buffer, SOKUTEI_TIMER_COUNTER_TYPE interval){
     target_buffer[0] = '8';
     target_buffer[1] = '\0';
 }
@@ -336,7 +337,7 @@ void sokutei_convert_counter_to_string(char *target_buffer, const int counter_in
         SOKUTEI_FLOAT_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, counter_index);
         sokutei_float_counter_to_string(target_buffer, counter_value);
     } else if(type_of_counter == SOKUTEI_INTERVAL_TYPE) {
-        SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE, counter_index);
+        SOKUTEI_TIMER_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_TIMER_COUNTER_TYPE, counter_index);
         sokutei_interval_timer_counter_to_string(target_buffer, counter_value);
     } else {
         sokutei_error_counter_to_string();
