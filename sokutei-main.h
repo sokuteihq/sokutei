@@ -28,6 +28,7 @@
 #include "./platforms/sokutei-linux.h"
 #include "./platforms/sokutei-cuda.h"
 #include "./platforms/sokutei-macos.h"
+#include "./platforms/sokutei-arduino.h"
 
 
 
