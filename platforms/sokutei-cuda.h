@@ -1,7 +1,7 @@
+#if SOKUTEI_OS_TYPE == SOKUTEI_CUDA
+
 #ifndef SOKUTEI_SOKUTEI_CUDA_H
 #define SOKUTEI_SOKUTEI_CUDA_H
-
-#if SOKUTEI_OS_TYPE == SOKUTEI_CUDA
 
     typedef struct couter_type{
         cudaEvent_t start;

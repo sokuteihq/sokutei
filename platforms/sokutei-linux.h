@@ -1,7 +1,7 @@
+#if SOKUTEI_OS_TYPE == SOKUTEI_LINUX
+
 #ifndef SOKUTEI_SOKUTEI_LINUX_H
 #define SOKUTEI_SOKUTEI_LINUX_H
-
-#if SOKUTEI_OS_TYPE == SOKUTEI_LINUX
 
 #   include <time.h>
 

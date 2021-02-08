@@ -1,7 +1,7 @@
+#if SOKUTEI_OS_TYPE == SOKUTEI_ARDUINO
+
 #ifndef SOKUTEI_SOKUTEI_ARDUINO_H
 #define SOKUTEI_SOKUTEI_ARDUINO_H
-
-#if SOKUTEI_OS_TYPE == SOKUTEI_ARDUINO
 
     typedef struct counter_type {
         unsigned long elapsed;
