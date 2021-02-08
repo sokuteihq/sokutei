@@ -1,7 +1,7 @@
 #if SOKUTEI_OS_TYPE == SOKUTEI_CUDA
 
-#ifndef SOKUTEI_SOKUTEI_CUDA_H
-#define SOKUTEI_SOKUTEI_CUDA_H
+#ifndef SOKUTEI_SOKUTEI_PLATFORM_H
+#define SOKUTEI_SOKUTEI_PLATFORM_H
 
     typedef struct couter_type{
         cudaEvent_t start;
@@ -29,4 +29,4 @@
 #   ifndef SOKUTEI_CUSTOM_TIMER
 #   endif //SOKUTEI_CUSTOM_TIMER
 #endif //CONDITIONAL
-#endif //SOKUTEI_SOKUTEI_CUDA_H
+#endif //SOKUTEI_SOKUTEI_PLATFORM_H

@@ -1,7 +1,7 @@
 #if SOKUTEI_OS_TYPE == SOKUTEI_ARDUINO
 
-#ifndef SOKUTEI_SOKUTEI_ARDUINO_H
-#define SOKUTEI_SOKUTEI_ARDUINO_H
+#ifndef SOKUTEI_SOKUTEI_PLATFORM_H
+#define SOKUTEI_SOKUTEI_PLATFORM_H
 
     typedef struct counter_type {
         unsigned long elapsed;
@@ -25,4 +25,4 @@
 #   ifndef SOKUTEI_CUSTOM_TIMER
 #   endif //SOKUTEI_CUSTOM_TIMER
 #endif //CONDITIONAL
-#endif //SOKUTEI_SOKUTEI_ARDUINO_H
+#endif //SOKUTEI_SOKUTEI_PLATFORM_H
