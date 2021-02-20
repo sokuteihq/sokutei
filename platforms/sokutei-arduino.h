@@ -3,6 +3,11 @@
 #ifndef SOKUTEI_SOKUTEI_PLATFORM_H
 #define SOKUTEI_SOKUTEI_PLATFORM_H
 
+#   ifndef sokutei_print_string
+#       define sokutei_print_string(string) Serial.print(string)
+#   endif
+
+
     typedef struct counter_type {
         unsigned long elapsed;
         unsigned long last_start;
