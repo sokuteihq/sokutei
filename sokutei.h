@@ -32,8 +32,8 @@
 
 #if SOKUTEI_OS_TYPE == SOKUTEI_WINDOWS
 
-#ifndef SOKUTEI_SOKUTEI_WINDOWS_H
-#define SOKUTEI_SOKUTEI_WINDOWS_H
+#ifndef SOKUTEI_SOKUTEI_PLATFORM_H
+#define SOKUTEI_SOKUTEI_PLATFORM_H
 
 #   include <time.h>
 
@@ -58,12 +58,12 @@
 #   ifndef SOKUTEI_CUSTOM_TIMER
 #   endif //SOKUTEI_CUSTOM_TIMER
 #endif //CONDITIONAL
-#endif //SOKUTEI_SOKUTEI_WINDOWS_H
+#endif //SOKUTEI_SOKUTEI_PLATFORM_H
 
 #if SOKUTEI_OS_TYPE == SOKUTEI_LINUX
 
-#ifndef SOKUTEI_SOKUTEI_LINUX_H
-#define SOKUTEI_SOKUTEI_LINUX_H
+#ifndef SOKUTEI_SOKUTEI_PLATFORM_H
+#define SOKUTEI_SOKUTEI_PLATFORM_H
 
 #   include <time.h>
 
@@ -88,12 +88,12 @@
 #   ifndef SOKUTEI_CUSTOM_TIMER
 #   endif //SOKUTEI_CUSTOM_TIMER
 #endif //CONDITIONAL
-#endif //SOKUTEI_SOKUTEI_LINUX_H
+#endif //SOKUTEI_SOKUTEI_PLATFORM_H
 
 #if SOKUTEI_OS_TYPE == SOKUTEI_CUDA
 
-#ifndef SOKUTEI_SOKUTEI_CUDA_H
-#define SOKUTEI_SOKUTEI_CUDA_H
+#ifndef SOKUTEI_SOKUTEI_PLATFORM_H
+#define SOKUTEI_SOKUTEI_PLATFORM_H
 
     typedef struct couter_type{
         cudaEvent_t start;
@@ -121,22 +121,22 @@
 #   ifndef SOKUTEI_CUSTOM_TIMER
 #   endif //SOKUTEI_CUSTOM_TIMER
 #endif //CONDITIONAL
-#endif //SOKUTEI_SOKUTEI_CUDA_H
+#endif //SOKUTEI_SOKUTEI_PLATFORM_H
 
 #if SOKUTEI_OS_TYPE == SOKUTEI_MACOS
 
-#ifndef SOKUTEI_SOKUTEI_MACOS_H
-#define SOKUTEI_SOKUTEI_MACOS_H
+#ifndef SOKUTEI_SOKUTEI_PLATFORM_H
+#define SOKUTEI_SOKUTEI_PLATFORM_H
 
 #   ifndef SOKUTEI_CUSTOM_TIMER
 #   endif //SOKUTEI_CUSTOM_TIMER
 #endif //CONDITIONAL
-#endif //SOKUTEI_SOKUTEI_MACOS_H
+#endif //SOKUTEI_SOKUTEI_PLATFORM_H
 
 #if SOKUTEI_OS_TYPE == SOKUTEI_ARDUINO
 
-#ifndef SOKUTEI_SOKUTEI_ARDUINO_H
-#define SOKUTEI_SOKUTEI_ARDUINO_H
+#ifndef SOKUTEI_SOKUTEI_PLATFORM_H
+#define SOKUTEI_SOKUTEI_PLATFORM_H
 
     typedef struct counter_type {
         unsigned long elapsed;
@@ -160,7 +160,7 @@
 #   ifndef SOKUTEI_CUSTOM_TIMER
 #   endif //SOKUTEI_CUSTOM_TIMER
 #endif //CONDITIONAL
-#endif //SOKUTEI_SOKUTEI_ARDUINO_H
+#endif //SOKUTEI_SOKUTEI_PLATFORM_H
 
 
 
@@ -228,7 +228,6 @@
 
 /// String functions
 
-
 int sokutei_strcmp(const char *string_a, const char *string_b){
     int i = 0;
     while(string_a[i] == string_b[i] && string_a[i]) i++;
@@ -242,50 +241,10 @@ char *sokutei_strcpy(char *string_a, const char *string_b){
     string_a[SOKUTEI_MAX_COUNTER_NAME_LENGTH] = '\0';
     return string_a;
 }
+
+
 #define sokutei_string_equals(string_a, string_b) (sokutei_strcmp(string_a, string_b) == 0)
 
-///--- String functions
-
-/// Reporting settings
-#define SOKUTEI_JSON 0
-#define SOKUTEI_CSV 1
-
-#ifndef SOKUTEI_REPORTING_FORMAT
-    #define SOKUTEI_REPORTING_FORMAT SOKUTEI_JSON
-#endif
-
-
-#ifndef sokutei_print_char
-#define sokutei_print_char(char) sokutei_print_char_handler(char)
-#endif
-
-#ifndef sokutei_print_string
-#define sokutei_print_string(string) sokutei_print_string_handler(string)
-#endif
-
-#if SOKUTEI_REPORTING_FORMAT == SOKUTEI_JSON
-    #define sokutei_begin_report() sokutei_json_begin_report()
-    #define sokutei_report_iteration() sokutei_json_report_iteration()
-    #define sokutei_end_report() sokutei_json_end_report()
-#elif SOKUTEI_REPORTING_FORMAT == SOKUTEI_CSV
-    #define sokutei_begin_report() sokutei_csv_begin_report()
-    #define sokutei_report_iteration() sokutei_csv_report_iteration()
-    #define sokutei_end_report() sokutei_csv_end_report()
-#endif
-///--- Reporting settings
-
-/// Counters
-
-
-/**
- * sokutei_counter_definitions is an array, which consists of the counter name followed by string terminator (\0), and the type of the counter.
- */
-char sokutei_counter_definitions[SOKUTEI_MAX_COUNTER_COUNT][SOKUTEI_MAX_COUNTER_NAME_LENGTH + SOKUTEI_TYPE_INDICATOR_PADDING] = {'\0'};
-
-#define sokutei_get_counter_name_at_index(index) sokutei_counter_definitions[index]
-
-char sokutei_counters[SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES] = {0};
-int sokutei_number_of_counters = 0;
 
 int sokutei_integer_counter_to_string(char *target_buffer, SOKUTEI_INTEGER_COUNTER_TYPE integer){
     char local_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
@@ -310,6 +269,7 @@ int sokutei_integer_counter_to_string(char *target_buffer, SOKUTEI_INTEGER_COUNT
     return length;
 }
 
+
 int sokutei_float_counter_to_string(char *target_buffer, SOKUTEI_FLOAT_COUNTER_TYPE floating_point){
     int digits = 0;
     SOKUTEI_INTEGER_COUNTER_TYPE integer_part = floating_point;
@@ -333,11 +293,21 @@ int sokutei_float_counter_to_string(char *target_buffer, SOKUTEI_FLOAT_COUNTER_T
 void sokutei_error_counter_to_string(){
 }
 
-///--- Counters
+///--- String functions
 
 
-/// Low level counter handling
+/// Counters
 
+/**
+ * sokutei_counter_definitions is an array, which consists of the counter name followed by string terminator (\0), and the type of the counter.
+ */
+char sokutei_counter_definitions[SOKUTEI_MAX_COUNTER_COUNT][SOKUTEI_MAX_COUNTER_NAME_LENGTH + SOKUTEI_TYPE_INDICATOR_PADDING] = {'\0'};
+
+char sokutei_counters[SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES] = {0};
+int sokutei_number_of_counters = 0;
+
+#define sokutei_get_counter_name_at_index(index) sokutei_counter_definitions[index]
+#define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
 
 char sokutei_get_type_of(const int index){
     return sokutei_counter_definitions[index][SOKUTEI_TYPE_INDICATOR_INDEX];
@@ -353,7 +323,6 @@ int sokutei_get_index_of_counter(const char *counter_name){
     }
     return SOKUTEI_NOT_FOUND;
 }
-
 
 
 inline int sokutei_is_unknown_counter_type(const char type){
@@ -390,7 +359,8 @@ int sokutei_add_counter(const char *counter_name, const char type){
     return sokutei_create_new_counter(counter_name, type);
 }
 
-///--- Low level counter handling
+///--- Counters
+
 
 
 /// Iterations
@@ -409,10 +379,7 @@ void sokutei_iteration_finish_handler(){
 ///--- Iterations
 
 
-/// Counter Getter and Setter functions
-
-#define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
-
+/// Integer counter functions
 SOKUTEI_INTEGER_COUNTER_TYPE sokutei_integer_get_counter(const char *counter_name){
     const int index = sokutei_get_index_of_counter(counter_name);
 
@@ -421,6 +388,9 @@ SOKUTEI_INTEGER_COUNTER_TYPE sokutei_integer_get_counter(const char *counter_nam
     }
     if(sokutei_get_type_of(index) != SOKUTEI_INTEGER_TYPE){
         //TODO call error
+        /*
+         * print error to output, and stop any printing after?
+         */
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
@@ -442,6 +412,8 @@ SOKUTEI_INTEGER_COUNTER_TYPE sokutei_integer_increment_counter(const char *count
     return *sokutei_counter_at_index(SOKUTEI_INTEGER_COUNTER_TYPE, index) += by;
 }
 
+///--- Integer counter functions
+/// Float counter functions
 
 SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_get_counter(const char *counter_name){
     const int index = sokutei_get_index_of_counter(counter_name);
@@ -472,8 +444,7 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
     return *sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, index) += by;
 }
 
-///--- Counter Getter and Setter functions
-
+///--- Float counter functions
 /// Timer counter functions
 
 SOKUTEI_TIMER_TYPE *sokutei_get_timer_counter(const char *counter_name){
@@ -495,7 +466,30 @@ void sokutei_timer_to_string(char *buffer, SOKUTEI_TIMER_COUNTER_TYPE *counter){
 
 ///--- Timer counter functions
 
-/// Reporting functions
+#define SOKUTEI_JSON 0
+#define SOKUTEI_CSV 1
+
+#ifndef SOKUTEI_REPORTING_FORMAT
+#   define SOKUTEI_REPORTING_FORMAT SOKUTEI_JSON
+#endif
+
+#if SOKUTEI_REPORTING_FORMAT == SOKUTEI_JSON
+#   define sokutei_begin_report() sokutei_json_begin_report()
+#   define sokutei_report_iteration() sokutei_json_report_iteration()
+#   define sokutei_end_report() sokutei_json_end_report()
+#elif SOKUTEI_REPORTING_FORMAT == SOKUTEI_CSV
+#   define sokutei_begin_report() sokutei_csv_begin_report()
+#   define sokutei_report_iteration() sokutei_csv_report_iteration()
+#   define sokutei_end_report() sokutei_csv_end_report()
+#endif
+
+#ifndef sokutei_print_char
+#   define sokutei_print_char(char) sokutei_print_char_handler(char)
+#endif
+
+#ifndef sokutei_print_string
+#   define sokutei_print_string(string) sokutei_print_string_handler(string)
+#endif
 
 void sokutei_print_char_handler(const char c) {
 }
@@ -519,6 +513,7 @@ void sokutei_convert_counter_to_string(char *target_buffer, const int counter_in
     }
 }
 
+// json
 
 void sokutei_json_begin_report() {
     sokutei_print_string("[");
@@ -548,6 +543,8 @@ void sokutei_json_end_report(){
     sokutei_print_string("]");
 }
 
+// csv
+
 void sokutei_csv_begin_report() {
     int counter;
     for(counter = 0; counter < sokutei_number_of_counters; counter++) {
@@ -558,7 +555,6 @@ void sokutei_csv_begin_report() {
     }
     sokutei_print_string("\n");
 }
-
 
 void sokutei_csv_report_iteration(){
     char value_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
@@ -577,9 +573,6 @@ void sokutei_csv_end_report(){
     ;
 }
 
-///--- Reporting functions
-
-///------------ Sokutei API ----
 
 //////------ Iteration handling ------
 #define sokutei_iteration_start() ;
@@ -604,11 +597,6 @@ void sokutei_csv_end_report(){
 #define sokutei_alter_float_counter(x, y) sokutei_float_increment_counter(x, y)
 #define sokutei_get_float_counter(x) sokutei_float_get_counter(x)
 //////------ Float counter operations
-
-///--- Sokutei API
-
-/// schema macros
-
 
 
 #define SOKUTEI_COUNT_INTEGER_RETURN_VALUES_AND_REPORT_EVERY_ITERATION_IN_JSON(counter_name, function_name, run_times, function_args...) \
@@ -654,7 +642,7 @@ void sokutei_csv_end_report(){
     } while(0);
 
 
-#define SOKUTEI_SUM_INTEGER_RETURN_VALUES_IN_CSV(counter_name, function_name, run_times, ...) \
+#define SOKUTEI_SUM_INTEGER_RETURN_VALUES_IN_CSV(counter_name, function_name, run_times, args...) \
     do {\
         sokutei_create_integer_counter(counter_name);\
         int sokutei_counter;\
@@ -667,6 +655,7 @@ void sokutei_csv_end_report(){
         sokutei_iteration_finish();\
         sokutei_csv_end_report();\
     } while(0);
+
 
 #endif //END OF SOKUTEI_BENCHMARK_H
 
