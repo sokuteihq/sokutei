@@ -38,21 +38,10 @@ jobs:
       shell: bash
       run: ls -l
 
-    - name: list2
-      working-directory: ${{runner.workspace}}
-      shell: bash
-      run: ls -l
-
     - name: list3
-      working-directory: ${{runner.workspace}}/build
+      working-directory: ${{runner.workspace}}/sokutei
       shell: bash
       run: ls -l
-
-    - name: Build
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: cmake --build . --config $BUILD_TYPE
 
     - name: Test
       working-directory: ${{runner.workspace}}/build
