@@ -36,7 +36,7 @@ jobs:
     - name: Amalgamate
       working-directory: ${{runner.workspace}}
       shell: bash
-      run: node ./sokutei/precompiler.js ./sokutei/sokutei-main.h
+      run: node ./sokutei/precompiler.js sokutei-main.h
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
