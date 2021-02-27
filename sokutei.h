@@ -4,15 +4,12 @@
 /// Determine operating system
 #ifndef SOKUTEI_OS_TYPE
 
-#define SOKUTEI_WINDOWS 1
-#define SOKUTEI_LINUX 2
-#define SOKUTEI_CUDA 3
-#define SOKUTEI_MACOS 4
-#define SOKUTEI_ARDUINO 5
+#define SOKUTEI_LINUX 1
+#define SOKUTEI_WINDOWS 2
+#define SOKUTEI_MACOS 3
+#define SOKUTEI_ARDUINO 4
 
-#if (defined(__NVCC__)) // CUDA
-#   define SOKUTEI_OS_TYPE SOKUTEI_CUDA
-#elif defined(linux) || defined(_linux) || defined(__linux__) || defined(__unix__) // Linux
+#if defined(linux) || defined(_linux) || defined(__linux__) || defined(__unix__) // Linux
 #   define SOKUTEI_OS_TYPE SOKUTEI_LINUX
 #elif defined(_WIN32) || defined(_WIN64) || defined(_WINDOWS) || defined(__WINDOWS__) // Windows
 #   define SOKUTEI_OS_TYPE SOKUTEI_WINDOWS
@@ -30,10 +27,61 @@
 #endif //SOKUTEI_SOKUTEI_COMMON_H
 
 
+#if (defined(__NVCC__))
+
+#ifndef SOKUTEI_SOKUTEI_PLATFORM_H
+#define SOKUTEI_SOKUTEI_PLATFORM_H
+
+    typedef struct couter_type{
+        cudaEvent_t start;
+        cudaEvent_t stop;
+        unsigned int elapsed;
+    } SOKUTEI_TIMER_TYPE;
+
+
+    SOKUTEI_TIMER_TYPE *sokutei_get_timer_counter(const char *);
+
+    void sokutei_timer_start_function(char *counter_name){
+        SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+        cudaEventCreate(&(counter->start));
+        cudaEventCreate(&(counter->stop));
+        cudaEventRecord(counter->start);
+    }
+
+    void sokutei_timer_start_function(char *counter_name){
+        SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+        cudaEventRecord(counter->stop);
+        cudaEventSynchronize(counter->stop);
+        cudaEventElapsedTime(&(counter->elapsed), counter->start, counter->stop);
+    }
+
+#   ifndef SOKUTEI_TIMER_COUNTER_TYPE
+#       define SOKUTEI_TIMER_COUNTER_TYPE SOKUTEI_TIMER_TYPE
+#   endif
+
+#   ifndef SOKUTEI_TIMER_START
+#       define SOKUTEI_TIMER_START sokutei_timer_start_function
+#   endif
+
+#   ifndef SOKUTEI_TIMER_STOP
+#       define SOKUTEI_TIMER_STOP sokutei_timer_stop_function
+#   endif
+
+#   ifndef SOKUTEI_CUSTOM_TIMER
+#   endif //SOKUTEI_CUSTOM_TIMER
+#endif //CONDITIONAL
+#endif //SOKUTEI_SOKUTEI_PLATFORM_H
+
 #if SOKUTEI_OS_TYPE == SOKUTEI_WINDOWS
 
 #ifndef SOKUTEI_SOKUTEI_PLATFORM_H
 #define SOKUTEI_SOKUTEI_PLATFORM_H
+
+#   include <stdio.h>
+
+#   ifndef sokutei_print_string
+#       define sokutei_print_string(string) printf("%s", string);
+#   endif
 
 #   include <time.h>
 
@@ -65,6 +113,13 @@
 #ifndef SOKUTEI_SOKUTEI_PLATFORM_H
 #define SOKUTEI_SOKUTEI_PLATFORM_H
 
+#   include <stdio.h>
+
+#   ifndef sokutei_print_string
+#       define sokutei_print_string(string) printf("%s", string);
+#   endif
+
+
 #   include <time.h>
 
     typedef struct counter_type {
@@ -90,43 +145,17 @@
 #endif //CONDITIONAL
 #endif //SOKUTEI_SOKUTEI_PLATFORM_H
 
-#if SOKUTEI_OS_TYPE == SOKUTEI_CUDA
-
-#ifndef SOKUTEI_SOKUTEI_PLATFORM_H
-#define SOKUTEI_SOKUTEI_PLATFORM_H
-
-    typedef struct couter_type{
-        cudaEvent_t start;
-        cudaEvent_t stop;
-        unsigned int elapsed;
-    } SOKUTEI_TIMER_TYPE;
-
-
-    SOKUTEI_TIMER_TYPE *sokutei_get_timer_counter(const char *);
-
-    void sokutei_timer_start_function(char *counter_name){
-        SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
-        cudaEventCreate(&(counter->start));
-        cudaEventCreate(&(counter->stop));
-        cudaEventRecord(counter->start);
-    }
-
-    void sokutei_timer_start_function(char *counter_name){
-        SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
-        cudaEventRecord(counter->stop);
-        cudaEventSynchronize(counter->stop);
-        cudaEventElapsedTime(&(counter->elapsed), counter->start, counter->stop);
-    }
-
-#   ifndef SOKUTEI_CUSTOM_TIMER
-#   endif //SOKUTEI_CUSTOM_TIMER
-#endif //CONDITIONAL
-#endif //SOKUTEI_SOKUTEI_PLATFORM_H
-
 #if SOKUTEI_OS_TYPE == SOKUTEI_MACOS
 
 #ifndef SOKUTEI_SOKUTEI_PLATFORM_H
 #define SOKUTEI_SOKUTEI_PLATFORM_H
+
+#   include <stdio.h>
+
+#   ifndef sokutei_print_string
+#       define sokutei_print_string(string) printf("%s", string);
+#   endif
+
 
 #   ifndef SOKUTEI_CUSTOM_TIMER
 #   endif //SOKUTEI_CUSTOM_TIMER
@@ -137,6 +166,11 @@
 
 #ifndef SOKUTEI_SOKUTEI_PLATFORM_H
 #define SOKUTEI_SOKUTEI_PLATFORM_H
+
+#   ifndef sokutei_print_string
+#       define sokutei_print_string(string) Serial.print(string)
+#   endif
+
 
     typedef struct counter_type {
         unsigned long elapsed;
