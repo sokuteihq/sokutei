@@ -4,15 +4,12 @@
 /// Determine operating system
 #ifndef SOKUTEI_OS_TYPE
 
-#define SOKUTEI_WINDOWS 1
-#define SOKUTEI_LINUX 2
-#define SOKUTEI_CUDA 3
-#define SOKUTEI_MACOS 4
-#define SOKUTEI_ARDUINO 5
+#define SOKUTEI_LINUX 1
+#define SOKUTEI_WINDOWS 2
+#define SOKUTEI_MACOS 3
+#define SOKUTEI_ARDUINO 4
 
-#if (defined(__NVCC__)) // CUDA
-#   define SOKUTEI_OS_TYPE SOKUTEI_CUDA
-#elif defined(linux) || defined(_linux) || defined(__linux__) || defined(__unix__) // Linux
+#if defined(linux) || defined(_linux) || defined(__linux__) || defined(__unix__) // Linux
 #   define SOKUTEI_OS_TYPE SOKUTEI_LINUX
 #elif defined(_WIN32) || defined(_WIN64) || defined(_WINDOWS) || defined(__WINDOWS__) // Windows
 #   define SOKUTEI_OS_TYPE SOKUTEI_WINDOWS
@@ -24,9 +21,9 @@
 
 #include "./platforms/sokutei-common.h"
 
+#include "./platforms/sokutei-cuda.h"
 #include "./platforms/sokutei-windows.h"
 #include "./platforms/sokutei-linux.h"
-#include "./platforms/sokutei-cuda.h"
 #include "./platforms/sokutei-macos.h"
 #include "./platforms/sokutei-arduino.h"
 
