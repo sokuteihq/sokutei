@@ -34,9 +34,9 @@ jobs:
       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
     - name: Amalgamate
-      working-directory: ${{runner.workspace}}/build
+      working-directory: ${{runner.workspace}}
       shell: bash
-      run: node precompiler.js sokutei-main.h
+      run: node ../precompiler.js ../sokutei-main.h
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
