@@ -1,4 +1,4 @@
-#if SOKUTEI_OS_TYPE == SOKUTEI_CUDA
+#if (defined(__NVCC__))
 
 #ifndef SOKUTEI_SOKUTEI_PLATFORM_H
 #define SOKUTEI_SOKUTEI_PLATFORM_H
@@ -25,6 +25,18 @@
         cudaEventSynchronize(counter->stop);
         cudaEventElapsedTime(&(counter->elapsed), counter->start, counter->stop);
     }
+
+#   ifndef SOKUTEI_TIMER_COUNTER_TYPE
+#       define SOKUTEI_TIMER_COUNTER_TYPE SOKUTEI_TIMER_TYPE
+#   endif
+
+#   ifndef SOKUTEI_TIMER_START
+#       define SOKUTEI_TIMER_START sokutei_timer_start_function
+#   endif
+
+#   ifndef SOKUTEI_TIMER_STOP
+#       define SOKUTEI_TIMER_STOP sokutei_timer_stop_function
+#   endif
 
 #   ifndef SOKUTEI_CUSTOM_TIMER
 #   endif //SOKUTEI_CUSTOM_TIMER
