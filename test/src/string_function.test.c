@@ -12,7 +12,7 @@ TEST sokutei_strcmp_should_return_zero_for_empty_inputs(void)
 
     // Then
     ASSERT_EQ(actual, expected);
-    PASS();
+    FAIL();
 }
 
 TEST sokutei_strcmp_should_return_zero_for_non_empty_equal_inputs(void)
