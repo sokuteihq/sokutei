@@ -33,10 +33,20 @@ jobs:
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
-    - name: Amalgamate
+    - name: list1
+      working-directory: ${{runner.workspace}}/../
+      shell: bash
+      run: ls -l
+
+    - name: list2
       working-directory: ${{runner.workspace}}
       shell: bash
-      run: node ../precompiler.js ../sokutei-main.h
+      run: ls -l
+
+    - name: list3
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: ls -l
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
