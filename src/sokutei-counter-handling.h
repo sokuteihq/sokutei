@@ -4,13 +4,11 @@ SOKUTEI_INTEGER_COUNTER_TYPE sokutei_integer_get_counter(const char *counter_nam
     const int index = sokutei_get_index_of_counter(counter_name);
 
     if(index == SOKUTEI_NOT_FOUND){
+        sokutei_print_error("(sokutei_integer_get_counter) Counter not found with name: ", counter_name);
         return SOKUTEI_NOT_FOUND;
     }
     if(sokutei_get_type_of(index) != SOKUTEI_INTEGER_TYPE){
-        //TODO call error
-        /*
-         * print error to output, and stop any printing after?
-         */
+        sokutei_print_error("(sokutei_integer_get_counter) Counter is not of SOKUTEI_INTEGER type: ", counter_name);
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
@@ -22,10 +20,11 @@ SOKUTEI_INTEGER_COUNTER_TYPE sokutei_integer_increment_counter(const char *count
     const int index = sokutei_get_index_of_counter(counter_name);
 
     if(index == SOKUTEI_NOT_FOUND){
+        sokutei_print_error("Counter not found with name: ", counter_name);
         return SOKUTEI_NOT_FOUND;
     }
     if(sokutei_get_type_of(index) != SOKUTEI_INTEGER_TYPE){
-        //TODO call error
+        sokutei_print_error("Counter is not of SOKUTEI_INTEGER type: ", counter_name);
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
@@ -39,10 +38,11 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_get_counter(const char *counter_name){
     const int index = sokutei_get_index_of_counter(counter_name);
 
     if(index == SOKUTEI_NOT_FOUND){
+        sokutei_print_error("Counter not found with name: ", counter_name);
         return SOKUTEI_NOT_FOUND;
     }
     if(sokutei_get_type_of(index) != SOKUTEI_FLOAT_TYPE){
-        //TODO call error
+        sokutei_print_error("Counter is not of SOKUTEI_FLOAT type: ", counter_name);
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
@@ -54,11 +54,12 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
     const int index = sokutei_get_index_of_counter(counter_name);
 
     if(index == SOKUTEI_NOT_FOUND){
+        sokutei_print_error("Counter not found with name: ", counter_name);
         return SOKUTEI_NOT_FOUND;
     }
 
     if(sokutei_get_type_of(index) != SOKUTEI_FLOAT_TYPE){
-        // TODO call error
+        sokutei_print_error("Counter is not of SOKUTEI_FLOAT type: ", counter_name);
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
     return *sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, index) += by;
@@ -70,10 +71,11 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
 SOKUTEI_TIMER_TYPE *sokutei_get_timer_counter(const char *counter_name){
     const int index = sokutei_get_index_of_counter(counter_name);
     if(index == SOKUTEI_NOT_FOUND){
+        sokutei_print_error("Counter not found with name: ", counter_name);
         return SOKUTEI_NOT_FOUND;
     }
     if(sokutei_get_type_of(index) != SOKUTEI_INTERVAL_TYPE){
-        //TODO call error
+        sokutei_print_error("Counter is not of SOKUTEI_TIMER type: ", counter_name);
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
     return sokutei_counter_at_index(SOKUTEI_TIMER_TYPE, index);
