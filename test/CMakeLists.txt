@@ -27,6 +27,9 @@ add_test(NAME  json_exporting COMMAND json_exporting)
 add_executable(string_function src/string_function.test.c )
 add_test(NAME  string_function COMMAND string_function)
 
+add_executable(errors src/errors.test.c )
+add_test(NAME  errors COMMAND errors)
+
 add_executable(timer_counter src/timer_counter.test.c)
 add_test(NAME  timer_counter COMMAND timer_counter)
 
