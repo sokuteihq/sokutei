@@ -1,7 +1,216 @@
 #ifndef SOKUTEI_BENCHMARK_H
 #define SOKUTEI_BENCHMARK_H
 
-#define SOKUTEI_MAX_MEASURED_ITERATIONS 10
+/// Determine operating system
+#ifndef SOKUTEI_OS_TYPE
+
+#define SOKUTEI_LINUX 1
+#define SOKUTEI_WINDOWS 2
+#define SOKUTEI_MACOS 3
+#define SOKUTEI_ARDUINO 4
+
+#if defined(linux) || defined(_linux) || defined(__linux__) || defined(__unix__) // Linux
+#   define SOKUTEI_OS_TYPE SOKUTEI_LINUX
+#elif defined(_WIN32) || defined(_WIN64) || defined(_WINDOWS) || defined(__WINDOWS__) // Windows
+#   define SOKUTEI_OS_TYPE SOKUTEI_WINDOWS
+#elif (defined(__MACH__) && defined(__APPLE__)) // MacOs
+#   define SOKUTEI_OS_TYPE SOKUTEI_MACOS
+#elif defined(ARDUINO) // Arduino
+#   define SOKUTEI_OS_TYPE SOKUTEI_ARDUINO
+#endif
+
+#ifndef SOKUTEI_SOKUTEI_COMMON_H
+#define SOKUTEI_SOKUTEI_COMMON_H
+
+
+
+#endif //SOKUTEI_SOKUTEI_COMMON_H
+
+
+#if (defined(__NVCC__))
+
+    typedef struct couter_type{
+        cudaEvent_t start;
+        cudaEvent_t stop;
+        unsigned int elapsed;
+    } CUDA_TIMER_TYPE;
+
+
+    SOKUTEI_TIMER_TYPE *sokutei_get_timer_counter(const char *);
+
+    void cuda_timer_start_function(char *counter_name){
+        SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+        cudaEventCreate(&(counter->start));
+        cudaEventCreate(&(counter->stop));
+        cudaEventRecord(counter->start);
+    }
+
+    void cuda_timer_stop_function(char *counter_name){
+        SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+        cudaEventRecord(counter->stop);
+        cudaEventSynchronize(counter->stop);
+        cudaEventElapsedTime(&(counter->elapsed), counter->start, counter->stop);
+    }
+
+#   ifndef SOKUTEI_TIMER_COUNTER_TYPE
+#       define SOKUTEI_TIMER_COUNTER_TYPE CUDA_TIMER_TYPE
+#   endif
+
+#   ifndef SOKUTEI_TIMER_START
+#       define SOKUTEI_TIMER_START cuda_timer_start_function
+#   endif
+
+#   ifndef SOKUTEI_TIMER_STOP
+#       define SOKUTEI_TIMER_STOP cuda_timer_stop_function
+#   endif
+
+#   ifndef SOKUTEI_CUSTOM_TIMER
+#   endif //SOKUTEI_CUSTOM_TIMER
+
+#endif //CONDITIONAL
+
+#if SOKUTEI_OS_TYPE == SOKUTEI_WINDOWS
+
+#ifndef SOKUTEI_SOKUTEI_PLATFORM_H
+#define SOKUTEI_SOKUTEI_PLATFORM_H
+
+#   include <stdio.h>
+
+#   ifndef sokutei_print_string
+#       define sokutei_print_string(string) printf("%s", string);
+#   endif
+
+#   include <time.h>
+
+    typedef struct counter_type {
+        clock_t elapsed;
+        clock_t last_start;
+    } SOKUTEI_TIMER_TYPE;
+
+    SOKUTEI_TIMER_TYPE *sokutei_get_timer_counter(const char *);
+
+    void sokutei_timer_start_function(char *counter_name){
+        SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+        counter->last_start = clock();
+    }
+
+    void sokutei_timer_stop_function(char *counter_name){
+        SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+        counter->elapsed += clock() - counter->last_start;
+        counter->last_start = 0;
+    }
+
+#   ifndef SOKUTEI_CUSTOM_TIMER
+#   endif //SOKUTEI_CUSTOM_TIMER
+#endif //CONDITIONAL
+#endif //SOKUTEI_SOKUTEI_PLATFORM_H
+
+#if SOKUTEI_OS_TYPE == SOKUTEI_LINUX
+
+#ifndef SOKUTEI_SOKUTEI_PLATFORM_H
+#define SOKUTEI_SOKUTEI_PLATFORM_H
+
+#   include <stdio.h>
+
+#   ifndef sokutei_print_string
+#       define sokutei_print_string(string) printf("%s", string);
+#   endif
+
+
+#   include <time.h>
+
+    typedef struct counter_type {
+        clock_t elapsed;
+        clock_t last_start;
+    } SOKUTEI_TIMER_TYPE;
+
+    SOKUTEI_TIMER_TYPE *sokutei_get_timer_counter(const char *);
+
+    void sokutei_timer_start_function(char *counter_name){
+        SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+        counter->last_start = clock();
+    }
+
+    void sokutei_timer_stop_function(char *counter_name){
+        SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+        counter->elapsed += clock() - counter->last_start;
+        counter->last_start = 0;
+    }
+
+#   ifndef SOKUTEI_CUSTOM_TIMER
+#   endif //SOKUTEI_CUSTOM_TIMER
+#endif //CONDITIONAL
+#endif //SOKUTEI_SOKUTEI_PLATFORM_H
+
+#if SOKUTEI_OS_TYPE == SOKUTEI_MACOS
+
+#ifndef SOKUTEI_SOKUTEI_PLATFORM_H
+#define SOKUTEI_SOKUTEI_PLATFORM_H
+
+#   include <stdio.h>
+
+#   ifndef sokutei_print_string
+#       define sokutei_print_string(string) printf("%s", string);
+#   endif
+
+
+#   ifndef SOKUTEI_CUSTOM_TIMER
+#   endif //SOKUTEI_CUSTOM_TIMER
+#endif //CONDITIONAL
+#endif //SOKUTEI_SOKUTEI_PLATFORM_H
+
+#if SOKUTEI_OS_TYPE == SOKUTEI_ARDUINO
+
+#ifndef SOKUTEI_SOKUTEI_PLATFORM_H
+#define SOKUTEI_SOKUTEI_PLATFORM_H
+
+#   ifndef sokutei_print_string
+#       define sokutei_print_string(string) Serial.print(string)
+#   endif
+
+
+    typedef struct counter_type {
+        unsigned long elapsed;
+        unsigned long last_start;
+    } SOKUTEI_TIMER_TYPE;
+
+
+    SOKUTEI_TIMER_TYPE *sokutei_get_timer_counter(const char *);
+
+    void sokutei_timer_start_function(char *counter_name){
+        SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+        counter->last_start = millis();
+    }
+
+    void sokutei_timer_stop_function(char *counter_name){
+        SOKUTEI_TIMER_TYPE *counter = sokutei_get_timer_counter(counter_name);
+        counter->elapsed += millis() - counter->last_start;
+        counter->last_start = 0;
+    }
+
+#   ifndef SOKUTEI_CUSTOM_TIMER
+#   endif //SOKUTEI_CUSTOM_TIMER
+#endif //CONDITIONAL
+#endif //SOKUTEI_SOKUTEI_PLATFORM_H
+
+
+
+
+#ifndef SOKUTEI_TIMER_COUNTER_TYPE
+#   define SOKUTEI_TIMER_COUNTER_TYPE SOKUTEI_TIMER_TYPE
+#endif
+
+#ifndef SOKUTEI_TIMER_START
+#   define SOKUTEI_TIMER_START sokutei_timer_start_function
+#endif
+
+#ifndef SOKUTEI_TIMER_STOP
+#   define SOKUTEI_TIMER_STOP sokutei_timer_stop_function
+#endif
+
+#endif
+///--- Determine operating system
+
 #define SOKUTEI_MAX_COUNTER_COUNT  100
 #define SOKUTEI_MAX_COUNTER_NAME_LENGTH 30
 
@@ -10,15 +219,15 @@
 
 #define SOKUTEI_INTEGER_COUNTER_TYPE int
 #define SOKUTEI_FLOAT_COUNTER_TYPE double
-#define SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE int
+
 
 #define MAX_SIZE_OF_TYPES   ((sizeof(SOKUTEI_INTEGER_COUNTER_TYPE) > sizeof(SOKUTEI_FLOAT_COUNTER_TYPE)) \
-                            ? ((sizeof(SOKUTEI_INTEGER_COUNTER_TYPE) > sizeof(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE)) \
+                            ? ((sizeof(SOKUTEI_INTEGER_COUNTER_TYPE) > sizeof(SOKUTEI_TIMER_COUNTER_TYPE)) \
                                 ? sizeof(SOKUTEI_INTEGER_COUNTER_TYPE) \
-                                : sizeof(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE))\
-                            : ((sizeof(SOKUTEI_FLOAT_COUNTER_TYPE) > sizeof(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE)) \
+                                : sizeof(SOKUTEI_TIMER_COUNTER_TYPE))\
+                            : ((sizeof(SOKUTEI_FLOAT_COUNTER_TYPE) > sizeof(SOKUTEI_TIMER_COUNTER_TYPE)) \
                                 ? sizeof(SOKUTEI_FLOAT_COUNTER_TYPE) \
-                                : sizeof(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE)))
+                                : sizeof(SOKUTEI_TIMER_COUNTER_TYPE)))
 
 #define SOKUTEI_INTEGER_TYPE '1'
 #define SOKUTEI_FLOAT_TYPE '2'
@@ -50,7 +259,6 @@
 
 /// String functions
 
-
 int sokutei_strcmp(const char *string_a, const char *string_b){
     int i = 0;
     while(string_a[i] == string_b[i] && string_a[i]) i++;
@@ -64,56 +272,15 @@ char *sokutei_strcpy(char *string_a, const char *string_b){
     string_a[SOKUTEI_MAX_COUNTER_NAME_LENGTH] = '\0';
     return string_a;
 }
+
+
 #define sokutei_string_equals(string_a, string_b) (sokutei_strcmp(string_a, string_b) == 0)
 
-///--- String functions
-
-/// Reporting settings
-#define SOKUTEI_JSON 0
-#define SOKUTEI_CSV 1
-
-#ifndef SOKUTEI_REPORTING_FORMAT
-    #define SOKUTEI_REPORTING_FORMAT SOKUTEI_JSON
-#endif
-
-
-#ifndef SOKUTEI_REPORTING_FORMAT
-#define sokutei_print_char(char) sokutei_print_char_handler(char)
-#endif
-
-#ifndef SOKUTEI_REPORTING_FORMAT
-#define sokutei_print_string(string) sokutei_print_string_handler(string)
-#endif
-
-#if SOKUTEI_REPORTING_FORMAT == SOKUTEI_JSON
-    #define sokutei_begin_report() sokutei_json_begin_report()
-    #define sokutei_report_iteration() sokutei_json_report_iteration()
-    #define sokutei_end_report() sokutei_json_end_report()
-#elif SOKUTEI_REPORTING_FORMAT == SOKUTEI_CSV
-    #define sokutei_begin_report() sokutei_csv_begin_report()
-    #define sokutei_report_iteration() sokutei_csv_report_iteration()
-    #define sokutei_end_report() sokutei_csv_end_report()
-#endif
-///--- Reporting settings
-
-/// Counters
-
-
-/**
- * sokutei_counter_definitions is an array, which consists of the counter name followed by string terminator (\0), and the type of the counter.
- */
-char sokutei_counter_definitions[SOKUTEI_MAX_COUNTER_COUNT][SOKUTEI_MAX_COUNTER_NAME_LENGTH + SOKUTEI_TYPE_INDICATOR_PADDING] = {'\0'};
-
-#define sokutei_get_counter_name_at_index(index) sokutei_counter_definitions[index]
-
-char sokutei_counters[SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES] = {0};
-int sokutei_number_of_counters = 0;
 
 int sokutei_integer_counter_to_string(char *target_buffer, SOKUTEI_INTEGER_COUNTER_TYPE integer){
     char local_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
     int index = SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH;
     int length = 0;
-    
     if(integer < 0){
         target_buffer[0] = '-';
         length = 1;
@@ -133,6 +300,7 @@ int sokutei_integer_counter_to_string(char *target_buffer, SOKUTEI_INTEGER_COUNT
     return length;
 }
 
+
 int sokutei_float_counter_to_string(char *target_buffer, SOKUTEI_FLOAT_COUNTER_TYPE floating_point){
     int digits = 0;
     SOKUTEI_INTEGER_COUNTER_TYPE integer_part = floating_point;
@@ -141,8 +309,7 @@ int sokutei_float_counter_to_string(char *target_buffer, SOKUTEI_FLOAT_COUNTER_T
 
     target_buffer[digits++] = '.';
     int precision;
-    for (precision = 0; precision < SOKUTEI_COUNTER_TO_STRING_PRECISION - 1; precision++) 
-    {
+    for (precision = 0; precision < SOKUTEI_COUNTER_TO_STRING_PRECISION - 1; precision++){
         floating_point *= 10;
         integer_part = (SOKUTEI_INTEGER_COUNTER_TYPE) floating_point;
         floating_point -= integer_part;
@@ -153,19 +320,25 @@ int sokutei_float_counter_to_string(char *target_buffer, SOKUTEI_FLOAT_COUNTER_T
     return digits;
 }
 
-int sokutei_interval_timer_counter_to_string(char *target_buffer, SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE interval){
-    target_buffer[0] = '8';
-    target_buffer[1] = '\0';
-}
 
 void sokutei_error_counter_to_string(){
 }
 
-///--- Counters
+///--- String functions
 
 
-/// Low level counter handling
+/// Counters
 
+/**
+ * sokutei_counter_definitions is an array, which consists of the counter name followed by string terminator (\0), and the type of the counter.
+ */
+char sokutei_counter_definitions[SOKUTEI_MAX_COUNTER_COUNT][SOKUTEI_MAX_COUNTER_NAME_LENGTH + SOKUTEI_TYPE_INDICATOR_PADDING] = {'\0'};
+
+char sokutei_counters[SOKUTEI_MAX_COUNTER_COUNT * MAX_SIZE_OF_TYPES] = {0};
+int sokutei_number_of_counters = 0;
+
+#define sokutei_get_counter_name_at_index(index) sokutei_counter_definitions[index]
+#define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
 
 char sokutei_get_type_of(const int index){
     return sokutei_counter_definitions[index][SOKUTEI_TYPE_INDICATOR_INDEX];
@@ -181,7 +354,6 @@ int sokutei_get_index_of_counter(const char *counter_name){
     }
     return SOKUTEI_NOT_FOUND;
 }
-
 
 
 inline int sokutei_is_unknown_counter_type(const char type){
@@ -204,27 +376,28 @@ inline int sokutei_create_new_counter(const char *counter_name, const char type)
 
 int sokutei_add_counter(const char *counter_name, const char type){
     if(sokutei_is_unknown_counter_type(type)){
+        sokutei_print_error("Invalid type: ", counter_name);
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
     if(sokutei_is_counter_limit_reached()){
+        sokutei_print_error("Counter limit reached: ", counter_name);
         return SOKUTEI_COUNTER_LIMIT_REACHED;
     }
 
     if(sokutei_get_index_of_counter(counter_name) != SOKUTEI_NOT_FOUND){
+        sokutei_print_error("Counter already exists: ", counter_name);
         return SOKUTEI_COUNTER_ALREADY_EXISTS;
     }
 
     return sokutei_create_new_counter(counter_name, type);
 }
 
-///--- Low level counter handling
+///--- Counters
+
 
 
 /// Iterations
-
-int sokutei_number_of_iterations =
-        SOKUTEI_MAX_MEASURED_ITERATIONS;
 
 int sokutei_current_iteration = 0;
 
@@ -240,18 +413,16 @@ void sokutei_iteration_finish_handler(){
 ///--- Iterations
 
 
-/// Counter Getter and Setter functions
-
-#define sokutei_counter_at_index(type, index) (type *)(sokutei_counters + (index * MAX_SIZE_OF_TYPES))
-
+/// Integer counter functions
 SOKUTEI_INTEGER_COUNTER_TYPE sokutei_integer_get_counter(const char *counter_name){
     const int index = sokutei_get_index_of_counter(counter_name);
 
     if(index == SOKUTEI_NOT_FOUND){
+        sokutei_print_error("(sokutei_integer_get_counter) Counter not found with name: ", counter_name);
         return SOKUTEI_NOT_FOUND;
     }
     if(sokutei_get_type_of(index) != SOKUTEI_INTEGER_TYPE){
-        //TODO call error
+        sokutei_print_error("(sokutei_integer_get_counter) Counter is not of SOKUTEI_INTEGER type: ", counter_name);
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
@@ -263,25 +434,29 @@ SOKUTEI_INTEGER_COUNTER_TYPE sokutei_integer_increment_counter(const char *count
     const int index = sokutei_get_index_of_counter(counter_name);
 
     if(index == SOKUTEI_NOT_FOUND){
+        sokutei_print_error("Counter not found with name: ", counter_name);
         return SOKUTEI_NOT_FOUND;
     }
     if(sokutei_get_type_of(index) != SOKUTEI_INTEGER_TYPE){
-        //TODO call error
+        sokutei_print_error("Counter is not of SOKUTEI_INTEGER type: ", counter_name);
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
     return *sokutei_counter_at_index(SOKUTEI_INTEGER_COUNTER_TYPE, index) += by;
 }
 
+///--- Integer counter functions
+/// Float counter functions
 
 SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_get_counter(const char *counter_name){
     const int index = sokutei_get_index_of_counter(counter_name);
 
     if(index == SOKUTEI_NOT_FOUND){
+        sokutei_print_error("Counter not found with name: ", counter_name);
         return SOKUTEI_NOT_FOUND;
     }
     if(sokutei_get_type_of(index) != SOKUTEI_FLOAT_TYPE){
-        //TODO call error
+        sokutei_print_error("Counter is not of SOKUTEI_FLOAT type: ", counter_name);
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
 
@@ -293,21 +468,64 @@ SOKUTEI_FLOAT_COUNTER_TYPE sokutei_float_increment_counter(const char *counter_n
     const int index = sokutei_get_index_of_counter(counter_name);
 
     if(index == SOKUTEI_NOT_FOUND){
+        sokutei_print_error("Counter not found with name: ", counter_name);
         return SOKUTEI_NOT_FOUND;
     }
 
     if(sokutei_get_type_of(index) != SOKUTEI_FLOAT_TYPE){
-        // TODO call error
+        sokutei_print_error("Counter is not of SOKUTEI_FLOAT type: ", counter_name);
         return SOKUTEI_NOT_MATCHING_TYPE;
     }
-    
     return *sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, index) += by;
 }
 
-///--- Counter Getter and Setter functions
+///--- Float counter functions
+/// Timer counter functions
 
+SOKUTEI_TIMER_TYPE *sokutei_get_timer_counter(const char *counter_name){
+    const int index = sokutei_get_index_of_counter(counter_name);
+    if(index == SOKUTEI_NOT_FOUND){
+        sokutei_print_error("Counter not found with name: ", counter_name);
+        return SOKUTEI_NOT_FOUND;
+    }
+    if(sokutei_get_type_of(index) != SOKUTEI_INTERVAL_TYPE){
+        sokutei_print_error("Counter is not of SOKUTEI_TIMER type: ", counter_name);
+        return SOKUTEI_NOT_MATCHING_TYPE;
+    }
+    return sokutei_counter_at_index(SOKUTEI_TIMER_TYPE, index);
+}
 
-/// Reporting functions
+void sokutei_timer_to_string(char *buffer, SOKUTEI_TIMER_COUNTER_TYPE *counter){
+    // seconds, miliseconds to print??? OS specific
+    sokutei_integer_counter_to_string(buffer, counter->elapsed);
+}
+
+///--- Timer counter functions
+
+#define SOKUTEI_JSON 0
+#define SOKUTEI_CSV 1
+
+#ifndef SOKUTEI_REPORTING_FORMAT
+#   define SOKUTEI_REPORTING_FORMAT SOKUTEI_JSON
+#endif
+
+#if SOKUTEI_REPORTING_FORMAT == SOKUTEI_JSON
+#   define sokutei_begin_report() sokutei_json_begin_report()
+#   define sokutei_report_iteration() sokutei_json_report_iteration()
+#   define sokutei_end_report() sokutei_json_end_report()
+#elif SOKUTEI_REPORTING_FORMAT == SOKUTEI_CSV
+#   define sokutei_begin_report() sokutei_csv_begin_report()
+#   define sokutei_report_iteration() sokutei_csv_report_iteration()
+#   define sokutei_end_report() sokutei_csv_end_report()
+#endif
+
+#ifndef sokutei_print_char
+#   define sokutei_print_char(char) sokutei_print_char_handler(char)
+#endif
+
+#ifndef sokutei_print_string
+#   define sokutei_print_string(string) sokutei_print_string_handler(string)
+#endif
 
 void sokutei_print_char_handler(const char c) {
 }
@@ -324,13 +542,14 @@ void sokutei_convert_counter_to_string(char *target_buffer, const int counter_in
         SOKUTEI_FLOAT_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_FLOAT_COUNTER_TYPE, counter_index);
         sokutei_float_counter_to_string(target_buffer, counter_value);
     } else if(type_of_counter == SOKUTEI_INTERVAL_TYPE) {
-        SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE counter_value = *sokutei_counter_at_index(SOKUTEI_INTERVAL_TIMER_COUNTER_TYPE, counter_index);
-        sokutei_interval_timer_counter_to_string(target_buffer, counter_value);
+        SOKUTEI_TIMER_COUNTER_TYPE *counter_value = sokutei_counter_at_index(SOKUTEI_TIMER_COUNTER_TYPE, counter_index);
+        sokutei_timer_to_string(target_buffer, counter_value);
     } else {
         sokutei_error_counter_to_string();
     }
 }
 
+// json
 
 void sokutei_json_begin_report() {
     sokutei_print_string("[");
@@ -360,6 +579,8 @@ void sokutei_json_end_report(){
     sokutei_print_string("]");
 }
 
+// csv
+
 void sokutei_csv_begin_report() {
     int counter;
     for(counter = 0; counter < sokutei_number_of_counters; counter++) {
@@ -370,7 +591,6 @@ void sokutei_csv_begin_report() {
     }
     sokutei_print_string("\n");
 }
-
 
 void sokutei_csv_report_iteration(){
     char value_to_string_buffer[SOKUTEI_COUNTER_TO_STRING_BUFFER_LENGTH + 1] = {'\0'};
@@ -389,9 +609,13 @@ void sokutei_csv_end_report(){
     ;
 }
 
-///--- Reporting functions
+void sokutei_print_error(const char *error_message, const char *error_param ) {
+    sokutei_print_string("SOKUTEI ERROR: [");
+    sokutei_print_string(error_message);
+    sokutei_print_string(error_param);
+    sokutei_print_string("]\n");
+}
 
-///------------ Sokutei API ----
 
 //////------ Iteration handling ------
 #define sokutei_iteration_start() ;
@@ -417,8 +641,64 @@ void sokutei_csv_end_report(){
 #define sokutei_get_float_counter(x) sokutei_float_get_counter(x)
 //////------ Float counter operations
 
-///--- Sokutei API
 
+#define SOKUTEI_COUNT_INTEGER_RETURN_VALUES_AND_REPORT_EVERY_ITERATION_IN_JSON(counter_name, function_name, run_times, function_args...) \
+    do {\
+        sokutei_create_integer_counter(counter_name);\
+        int sokutei_counter;\
+        sokutei_iteration_start();\
+        sokutei_json_begin_report();\
+        for(sokutei_counter = 0; sokutei_counter < run_times; sokutei_counter++){\
+            sokutei_integer_increment_counter(counter_name, function_name (function_args));\
+            sokutei_json_report_iteration();\
+            sokutei_iteration_finish();\
+        }\
+        sokutei_json_end_report();\
+    } while(0);
+
+#define SOKUTEI_COUNT_INTEGER_RETURN_VALUES_AND_REPORT_EVERY_ITERATION_IN_CSV(counter_name, function_name, run_times, ...) \
+    do {\
+        sokutei_create_integer_counter(counter_name);\
+        int sokutei_counter;\
+        sokutei_iteration_start();\
+        sokutei_csv_begin_report();\
+        for(sokutei_counter = 0; sokutei_counter < run_times; sokutei_counter++){\
+            sokutei_integer_increment_counter(counter_name, function_name (__VA_ARGS__));\
+            sokutei_csv_report_iteration();\
+            sokutei_iteration_finish();\
+        }\
+        sokutei_csv_end_report();\
+    } while(0);
+
+#define SOKUTEI_SUM_INTEGER_RETURN_VALUES_IN_JSON(counter_name, function_name, run_times, ...) \
+    do {\
+        sokutei_create_integer_counter(counter_name);\
+        int sokutei_counter;\
+        sokutei_iteration_start();\
+        sokutei_json_begin_report();\
+        for(sokutei_counter = 0; sokutei_counter < run_times; sokutei_counter++){\
+            sokutei_integer_increment_counter(counter_name, function_name (__VA_ARGS__));\
+        }\
+        sokutei_json_report_iteration();\
+        sokutei_iteration_finish();\
+        sokutei_json_end_report();\
+    } while(0);
+
+
+#define SOKUTEI_SUM_INTEGER_RETURN_VALUES_IN_CSV(counter_name, function_name, run_times, args...) \
+    do {\
+        sokutei_create_integer_counter(counter_name);\
+        int sokutei_counter;\
+        sokutei_iteration_start();\
+        sokutei_csv_begin_report();\
+        for(sokutei_counter = 0; sokutei_counter < run_times; sokutei_counter++){\
+            sokutei_integer_increment_counter(counter_name, function_name (__VA_ARGS__));\
+        }\
+        sokutei_csv_report_iteration();\
+        sokutei_iteration_finish();\
+        sokutei_csv_end_report();\
+    } while(0);
 
 
 #endif //END OF SOKUTEI_BENCHMARK_H
+

@@ -66,7 +66,7 @@ TEST sokutei_begin_report_should_create_json_report_for_one_iteration_with_one_c
     //given
     const char *counter_name = "a new counter";
     sokutei_add_counter(counter_name, SOKUTEI_INTEGER_TYPE);
-    const char *expected = "{\"a new counter\":1}";
+    const char *expected = "{\"a new counter\":0}";
 
     //when
     sokutei_report_iteration();
@@ -82,7 +82,7 @@ TEST sokutei_begin_report_should_create_json_report_for_two_iterations_with_one_
     //given
     const char *counter_name = "a new counter";
     sokutei_add_counter(counter_name, SOKUTEI_INTEGER_TYPE);
-    const char *expected = "{\"a new counter\":1},{\"a new counter\":1}";
+    const char *expected = "{\"a new counter\":0},{\"a new counter\":0}";
 
     //when
     sokutei_report_iteration();
@@ -100,7 +100,7 @@ TEST sokutei_begin_report_should_create_json_report_for_one_iteration_with_two_c
     //given
     sokutei_add_counter("a", SOKUTEI_INTEGER_TYPE);
     sokutei_add_counter("b", SOKUTEI_INTEGER_TYPE);
-    const char *expected = "{\"a\":1,\"b\":1}";
+    const char *expected = "{\"a\":0,\"b\":0}";
 
     //when
     sokutei_report_iteration();
@@ -117,7 +117,7 @@ TEST sokutei_begin_report_should_create_full_json_report_for_one_iteration_with_
     sokutei_add_counter("a", SOKUTEI_INTEGER_TYPE);
     sokutei_add_counter("b", SOKUTEI_INTEGER_TYPE);
     sokutei_add_counter("c", SOKUTEI_INTEGER_TYPE);
-    const char *expected = "[{\"a\":1,\"b\":1,\"c\":1}]";
+    const char *expected = "[{\"a\":0,\"b\":0,\"c\":0}]";
 
     //when
     sokutei_begin_report();
@@ -136,7 +136,7 @@ TEST sokutei_begin_report_should_create_full_json_report_for_two_iterations_with
     sokutei_add_counter("a", SOKUTEI_INTEGER_TYPE);
     sokutei_add_counter("b", SOKUTEI_INTEGER_TYPE);
     sokutei_add_counter("c", SOKUTEI_INTEGER_TYPE);
-    const char *expected = "[{\"a\":1,\"b\":1,\"c\":1},{\"a\":1,\"b\":1,\"c\":1}]";
+    const char *expected = "[{\"a\":0,\"b\":0,\"c\":0},{\"a\":0,\"b\":0,\"c\":0}]";
 
     //when
     sokutei_begin_report();

@@ -55,5 +55,4 @@ dkms.conf
 
 cmake-build-debug
 .idea
-CMakeLists.txt
 node_modules
