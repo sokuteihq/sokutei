@@ -104,3 +104,10 @@ void sokutei_csv_report_iteration(){
 void sokutei_csv_end_report(){
     ;
 }
+
+void sokutei_print_error(const char *error_message, const char *error_param ) {
+    sokutei_print_string("SOKUTEI ERROR: [");
+    sokutei_print_string(error_message);
+    sokutei_print_string(error_param);
+    sokutei_print_string("]\n");
+}
