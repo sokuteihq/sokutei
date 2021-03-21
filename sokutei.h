@@ -22,7 +22,7 @@
 #ifndef SOKUTEI_SOKUTEI_COMMON_H
 #define SOKUTEI_SOKUTEI_COMMON_H
 
-
+void sokutei_print_error(const char *error_message, const char *error_param );
 
 #endif //SOKUTEI_SOKUTEI_COMMON_H
 
@@ -393,6 +393,23 @@ int sokutei_add_counter(const char *counter_name, const char type){
     return sokutei_create_new_counter(counter_name, type);
 }
 
+
+int sokutei_ensure_counter(const char *counter_name, const char type){
+    if(sokutei_is_unknown_counter_type(type)){
+        sokutei_print_error("Invalid type: ", counter_name);
+        return SOKUTEI_NOT_MATCHING_TYPE;
+    }
+
+    if(sokutei_is_counter_limit_reached()){
+        sokutei_print_error("Counter limit reached: ", counter_name);
+        return SOKUTEI_COUNTER_LIMIT_REACHED;
+    }
+
+    if(sokutei_get_index_of_counter(counter_name) == SOKUTEI_NOT_FOUND) {
+        return sokutei_create_new_counter(counter_name, type);
+    }
+    return 0;
+}
 ///--- Counters
 
 
@@ -527,6 +544,13 @@ void sokutei_timer_to_string(char *buffer, SOKUTEI_TIMER_COUNTER_TYPE *counter){
 #   define sokutei_print_string(string) sokutei_print_string_handler(string)
 #endif
 
+void sokutei_print_error(const char *error_message, const char *error_param ) {
+    sokutei_print_string("SOKUTEI ERROR: [");
+    sokutei_print_string(error_message);
+    sokutei_print_string(error_param);
+    sokutei_print_string("]\n");
+}
+
 void sokutei_print_char_handler(const char c) {
 }
 
@@ -609,12 +633,7 @@ void sokutei_csv_end_report(){
     ;
 }
 
-void sokutei_print_error(const char *error_message, const char *error_param ) {
-    sokutei_print_string("SOKUTEI ERROR: [");
-    sokutei_print_string(error_message);
-    sokutei_print_string(error_param);
-    sokutei_print_string("]\n");
-}
+
 
 
 //////------ Iteration handling ------
