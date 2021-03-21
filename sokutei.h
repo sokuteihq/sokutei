@@ -22,7 +22,7 @@
 #ifndef SOKUTEI_SOKUTEI_COMMON_H
 #define SOKUTEI_SOKUTEI_COMMON_H
 
-
+void sokutei_print_error(const char *error_message, const char *error_param );
 
 #endif //SOKUTEI_SOKUTEI_COMMON_H
 
@@ -527,6 +527,13 @@ void sokutei_timer_to_string(char *buffer, SOKUTEI_TIMER_COUNTER_TYPE *counter){
 #   define sokutei_print_string(string) sokutei_print_string_handler(string)
 #endif
 
+void sokutei_print_error(const char *error_message, const char *error_param ) {
+    sokutei_print_string("SOKUTEI ERROR: [");
+    sokutei_print_string(error_message);
+    sokutei_print_string(error_param);
+    sokutei_print_string("]\n");
+}
+
 void sokutei_print_char_handler(const char c) {
 }
 
@@ -609,12 +616,7 @@ void sokutei_csv_end_report(){
     ;
 }
 
-void sokutei_print_error(const char *error_message, const char *error_param ) {
-    sokutei_print_string("SOKUTEI ERROR: [");
-    sokutei_print_string(error_message);
-    sokutei_print_string(error_param);
-    sokutei_print_string("]\n");
-}
+
 
 
 //////------ Iteration handling ------
