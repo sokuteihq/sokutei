@@ -1,5 +1,5 @@
-#include "../../greatest.h"
-#include "../../sokutei.h"
+#include "../../../greatest.h"
+#include "../../../sokutei.h"
 
 TEST integer_get_counter_should_return_with_not_found_if_nonexist_counter_is_given(void) {
     //given
