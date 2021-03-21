@@ -33,3 +33,6 @@ add_test(NAME  errors COMMAND errors)
 add_executable(timer_counter src/timer_counter.test.c)
 add_test(NAME  timer_counter COMMAND timer_counter)
 
+add_executable(ensure_counter src/ensure_counter.test.c)
+add_test(NAME  ensure_counter COMMAND ensure_counter)
+
