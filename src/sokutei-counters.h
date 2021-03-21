@@ -62,3 +62,21 @@ int sokutei_add_counter(const char *counter_name, const char type){
 
     return sokutei_create_new_counter(counter_name, type);
 }
+
+
+int sokutei_ensure_counter(const char *counter_name, const char type){
+    if(sokutei_is_unknown_counter_type(type)){
+        sokutei_print_error("Invalid type: ", counter_name);
+        return SOKUTEI_NOT_MATCHING_TYPE;
+    }
+
+    if(sokutei_is_counter_limit_reached()){
+        sokutei_print_error("Counter limit reached: ", counter_name);
+        return SOKUTEI_COUNTER_LIMIT_REACHED;
+    }
+
+    if(sokutei_get_index_of_counter(counter_name) == SOKUTEI_NOT_FOUND) {
+        return sokutei_create_new_counter(counter_name, type);
+    }
+    return 0;
+}
