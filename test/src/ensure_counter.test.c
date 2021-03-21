@@ -69,7 +69,7 @@ TEST sokutei_ensure_counter_should_not_change_the_state_of_a_counter(void)
     PASS();
 }
 
-SUITE(create_counter_tests)
+SUITE(ensure_counter_tests)
 {
             RUN_TEST(sokutei_ensure_counter_should_add_a_new_non_existing_counter_and_return_without_any_error);
             RUN_TEST(sokutei_ensure_counter_should_not_add_an_existing_counter_and_should_not_produce_any_error);
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 {
     GREATEST_MAIN_BEGIN();
 
-    RUN_SUITE(create_counter_tests);
+    RUN_SUITE(ensure_counter_tests);
 
     GREATEST_MAIN_END();
 }
