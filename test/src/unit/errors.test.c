@@ -19,8 +19,8 @@ void print_string(const char *string) {
 #define sokutei_print_char(char) print_char(char)
 #define sokutei_print_string(string) print_string(string)
 
-#include "../../greatest.h"
-#include "../../sokutei.h"
+#include "../../../greatest.h"
+#include "../../../sokutei.h"
 
 void reset_test(){
     buffer[0] = '\0';

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../../greatest.h"
+#include "../../../greatest.h"
 
 
 char buffer[1024] = {'\0'};
@@ -23,7 +23,7 @@ void print_string(const char *string) {
 #define sokutei_print_string(string) print_string(string)
 
 #define SOKUTEI_REPORTING_FORMAT 0
-#include "../../sokutei.h"
+#include "../../../sokutei.h"
 
 void reset_test(){
     buffer[0] = '\0';

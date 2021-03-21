@@ -1,5 +1,5 @@
-#include "../../greatest.h"
-#include "../../sokutei.h"
+#include "../../../greatest.h"
+#include "../../../sokutei.h"
 
 TEST sokutei_add_counter_should_add_the_maximal_number_of_counters_without_error(void)
 {

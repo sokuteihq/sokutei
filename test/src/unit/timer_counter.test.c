@@ -19,7 +19,7 @@ void print_string(const char *string) {
 #define sokutei_print_string(string) printf("%s", string)
 
 #define SOKUTEI_REPORTING_FORMAT 0
-#include "../../sokutei.h"
+#include "../../../sokutei.h"
 
 int a(int n){
     if(n == 0){
@@ -39,7 +39,7 @@ int main(){
     SOKUTEI_TIMER_START("asdaq");
 
     int i;
-    for(i = 1; i < 33000; i++){
+    for(i = 1; i < 3300; i++){
         a(i);
     }
     SOKUTEI_TIMER_STOP("asdaq");

@@ -1,5 +1,5 @@
-#include "../../greatest.h"
-#include "../../sokutei.h"
+#include "../../../greatest.h"
+#include "../../../sokutei.h"
 
 TEST sokutei_strcmp_should_return_zero_for_empty_inputs(void)
 {

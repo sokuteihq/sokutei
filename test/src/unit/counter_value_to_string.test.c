@@ -1,5 +1,5 @@
-#include "../../greatest.h"
-#include "../../sokutei.h"
+#include "../../../greatest.h"
+#include "../../../sokutei.h"
 
 TEST sokutei_integer_counter_to_string_should_convert_zero_to_string(void)
 {
