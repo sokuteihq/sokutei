@@ -43,7 +43,7 @@ TEST sokutei_ensure_counter_should_not_add_an_invalid_type_counter_and_should_re
     const int expected_number_of_counters = sokutei_number_of_counters;
 
     //when
-    const int actual = sokutei_add_counter(counter_name, invalid_counter_type);
+    const int actual = sokutei_ensure_counter(counter_name, invalid_counter_type);
 
     //then
             ASSERT_EQ(expected, actual);
