@@ -24,7 +24,7 @@
   "dependencies": {
     "@commitlint/cli": "11.0.0",
     "@commitlint/config-conventional": "11.0.0",
-    "convict": "6.0.0",
+    "convict": "6.2.2",
     "got": "11.8.0",
     "husky": "4.3.0"
   }
